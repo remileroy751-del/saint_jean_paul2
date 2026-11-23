@@ -29,11 +29,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.connecttest.app"
+        applicationId = "org.saintjeanpaul2.suivi"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "2.0"
 
         val supabaseUrl = (project.findProperty("SUPABASE_URL") as String?) ?: "https://aexuugygfuesjumtjnmk.supabase.co"
         val supabaseKey = (project.findProperty("SUPABASE_ANON_KEY") as String?) ?: "sb_publishable_68ZJ936KFGDCeDARp4J3dg_kyyAZwmV"
@@ -60,7 +60,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

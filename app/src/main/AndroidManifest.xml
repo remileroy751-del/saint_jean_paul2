@@ -7,10 +7,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <application
-        android:icon="@drawable/connect_test_launcher"
-        android:roundIcon="@drawable/connect_test_launcher"
+        android:icon="@drawable/sjp2_launcher"
+        android:roundIcon="@drawable/sjp2_launcher"
         android:allowBackup="true"
-        android:label="SAINT JEAN PAUL II"
+        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.ConnectTest">
         <activity
@@ -22,6 +22,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <service
             android:name=".ConnectTestNotificationService"
             android:exported="false"

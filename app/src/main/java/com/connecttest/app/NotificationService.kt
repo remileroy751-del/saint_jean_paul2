@@ -111,7 +111,7 @@ class ConnectTestNotificationService : Service() {
 
     private fun acquireShortWakeLock(): PowerManager.WakeLock? = runCatching {
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ConnectTest:poll").apply { acquire(25_000L) }
+        pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SJP2:poll").apply { acquire(25_000L) }
     }.getOrNull()
 
     private fun loadSeen(prefs: SharedPreferences): MutableList<String> =
@@ -128,8 +128,8 @@ class ConnectTestNotificationService : Service() {
         )
         return NotificationCompat.Builder(this, CHANNEL_BACKGROUND)
             .setSmallIcon(R.drawable.ic_stat_connect_test)
-            .setColor(0xFF123B66.toInt())
-            .setContentTitle("CONNECT TEST")
+            .setColor(0xFF040678.toInt())
+            .setContentTitle("Saint Jean Paul II")
             .setContentText("")
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
@@ -150,10 +150,10 @@ class ConnectTestNotificationService : Service() {
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val title = item.title.ifBlank { "Nouveau message — CONNECT TEST" }
+        val title = item.title.ifBlank { "Nouveau message — Saint Jean Paul II" }
         val notification = NotificationCompat.Builder(this, CHANNEL_MESSAGES)
             .setSmallIcon(R.drawable.ic_stat_connect_test)
-            .setColor(0xFF123B66.toInt())
+            .setColor(0xFF040678.toInt())
             .setContentTitle(title)
             .setContentText(item.body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(item.body))
@@ -183,18 +183,18 @@ fun createNotificationChannels(context: Context) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
     val manager = context.getSystemService(NotificationManager::class.java)
     manager.createNotificationChannel(
-        NotificationChannel(CHANNEL_BACKGROUND, "CONNECT TEST (service)", NotificationManager.IMPORTANCE_LOW).apply {
-            description = "Maintient CONNECT TEST à l'écoute des nouveaux messages"
+        NotificationChannel(CHANNEL_BACKGROUND, "Saint Jean Paul II (service)", NotificationManager.IMPORTANCE_LOW).apply {
+            description = "Maintient l'application à l'écoute des nouveaux messages"
             setShowBadge(false)
         }
     )
     manager.createNotificationChannel(
-        NotificationChannel(CHANNEL_MESSAGES, "Messages CONNECT TEST", NotificationManager.IMPORTANCE_HIGH).apply {
-            description = "Messages de la Direction, des parents et des enseignants"
+        NotificationChannel(CHANNEL_MESSAGES, "Messages Saint Jean Paul II", NotificationManager.IMPORTANCE_HIGH).apply {
+            description = "Messages de la Direction, des parents, des enseignants et de la cantine"
             enableVibration(true)
             vibrationPattern = longArrayOf(0, 300, 200, 300)
             enableLights(true)
-            lightColor = 0xFFB8C7D9.toInt()
+            lightColor = 0xFFFCEE76.toInt()
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             setShowBadge(true)
             setSound(

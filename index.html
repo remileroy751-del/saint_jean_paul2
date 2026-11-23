@@ -1,102 +1,291 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Complexe Scolaire SAINT JEAN PAUL II — Administration</title>
-<link rel="icon" type="image/png" href="connect_test_logo.png">
+<link rel="icon" type="image/png" href="logo_sjp2.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
-:root{--brown:#071A8C;--brown2:#142CB5;--gold:#FFE84A;--gold2:#F4D92E;--cream:#FFFCE0;--cream2:#FFF9C9;--white:#FFFFFF;--bg:#F6F8FB;--text:#111111;--muted:#5B6773;--line:#D7DEE7;--green:#071A8C;--red:#7A2432;--shadow:0 14px 40px rgba(93,40,3,.10)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}.muted{color:var(--muted)}
-.login{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top right,#E8F0F8 0,#FFFFFF 38%,#EDF2F7 100%)}.login-card{width:min(480px,100%);background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:28px;padding:34px;box-shadow:0 30px 90px rgba(93,40,3,.16)}.logo{width:76px;height:76px;border-radius:22px;background:var(--brown);color:var(--gold);display:grid;place-items:center;font-size:23px;font-weight:950;letter-spacing:-1px;margin-bottom:18px}.login h1{margin:0;color:var(--brown);font-size:30px;letter-spacing:-.5px}.tag{margin:5px 0 25px}
-.field{display:grid;gap:7px;margin:11px 0}.field label{font-weight:800;font-size:13px;color:var(--brown)}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px 13px;outline:none;color:var(--text)}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(233,185,99,.22)}.field textarea{min-height:110px;resize:vertical}
-.btn{border:0;border-radius:12px;padding:11px 15px;background:var(--brown);color:#fff;font-weight:850;transition:.18s ease}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn.lime{background:var(--gold);color:var(--brown)}.btn.ghost{background:var(--cream);color:var(--brown)}.btn.orange{background:var(--gold2)}.btn.red{background:var(--red)}.btn.small{padding:8px 10px;font-size:12px}.notice{padding:11px 13px;border-radius:12px;background:var(--cream);margin:12px 0;font-size:13px}.notice.danger{background:#F6E4E8;color:#651D2A}.notice.info{background:var(--cream);color:var(--brown)}
-.app{min-height:100vh}.side{position:fixed;inset:0 auto 0 0;width:278px;background:linear-gradient(180deg,#071A8C 0%,#02085C 100%);color:#fff;padding:20px 15px;z-index:5;overflow:auto;box-shadow:12px 0 35px rgba(93,40,3,.12)}.brand{font-size:21px;font-weight:950;margin:4px 10px 22px;display:flex;align-items:center;gap:10px}.brand img{width:58px;height:58px;object-fit:contain;border-radius:14px;background:#fff;padding:2px;flex:none}.admin-logo{width:118px;height:118px;object-fit:contain;border-radius:20px;background:#fff;border:1px solid var(--line);margin-bottom:14px;display:block}.brand small{display:block;color:#DCE8F3;font-size:9px;line-height:1.4;margin-top:5px}.role{margin:0 8px 18px;padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.10);font-size:11px;border:1px solid rgba(233,185,99,.25)}
-.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#fff;text-align:left;padding:12px 13px;border-radius:12px;font-weight:750;transition:.16s}.nav button:hover{background:rgba(255,255,255,.10);transform:translateX(2px)}.nav button.active{background:var(--gold);color:var(--brown);box-shadow:0 5px 18px rgba(0,0,0,.16)}.nav button span{opacity:.82;margin-right:8px}
-.main{margin-left:278px;padding:28px;max-width:1700px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.top h2{margin:0;color:var(--brown);font-size:28px;letter-spacing:-.4px}.section{display:none}.section.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}.stat{position:relative;overflow:hidden}.stat:before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--gold)}.stat .label{color:var(--muted);font-size:13px}.stat b{display:block;color:var(--brown);font-size:32px;margin-top:7px}.stat .sub{font-size:11px;color:var(--muted);margin-top:4px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.toolbar{display:flex;gap:9px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px}.search{max-width:360px;flex:1}.search input{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}.table{width:100%;border-collapse:collapse;min-width:680px}.table th,.table td{padding:11px 12px;border-bottom:1px solid #E7EDF4;text-align:left;vertical-align:top}.table th{font-size:11px;color:var(--brown);text-transform:uppercase;background:var(--cream2);position:sticky;top:0}.table tr:hover td{background:#FFFFFF}.table tr:last-child td{border-bottom:0}
-.pill{display:inline-flex;padding:5px 8px;border-radius:99px;font-size:10px;font-weight:900}.pill.green{background:#E5EEF7;color:#123B66}.pill.orange{background:#EAF0F6;color:#7A2432}.pill.red{background:#F6E4E8;color:#651D2A}.pill.gray{background:#E9EEF4;color:#5B6773}.actions{display:flex;gap:5px;flex-wrap:wrap}.kpi{font-size:13px}.empty{text-align:center;padding:25px;color:var(--muted)}.section h3{margin-top:0;color:var(--brown)}.hint{font-size:12px;color:var(--muted)}.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:900;letter-spacing:2px;color:var(--brown)}
-.modal{position:fixed;inset:0;background:rgba(35,20,10,.58);display:grid;place-items:center;padding:20px;z-index:20}.modal-card{width:min(720px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;border:1px solid var(--line)}.close{float:right;border:0;background:var(--cream);color:var(--brown);border-radius:10px;padding:7px 10px}.danger-zone{border:1px solid #E9D2D8;background:#FAFBFC;border-radius:14px;padding:14px}.admin-code-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.admin-code-tabs button{flex:1;min-width:210px}.admin-code-panel{margin-top:10px}.mobile-nav{display:none}
-@media(max-width:1050px){.grid{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}.side{width:235px}.main{margin-left:235px}}
-@media(max-width:720px){.side{position:static;width:100%;padding:13px}.brand{margin-bottom:12px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.main{margin-left:0;padding:14px}.top{align-items:flex-start}.grid,.formgrid{grid-template-columns:1fr}.table{min-width:800px}}
-.cycle-primary-accent{background:#F8C5DC}
+:root{
+  --navy:#040678;--navy2:#0B0FA6;--navy-dark:#02034F;
+  --yellow:#FCEE76;--yellow-pale:#FFF9D2;--yellow-deep:#E9D63A;
+  --pink:#EC5F9E;--pink-pale:#FDE7F1;--pink-deep:#C93B7C;
+  --white:#fff;--bg:#F7F7FC;--text:#12122B;--muted:#5C6080;--line:#DCDDF0;
+  --green:#14804A;--green-pale:#DDF3E7;--red:#B3261E;--red-pale:#FBE4E2;--orange:#9A6A00;--orange-pale:#FFF1CC;
+  --shadow:0 14px 40px rgba(4,6,120,.10);
+  /* thème actif (modifié par .lvl-primaire / .lvl-college) */
+  --accent:var(--yellow);--accent-ink:var(--navy);--tint:var(--yellow-pale);--accent-deep:var(--yellow-deep);
+}
+body.lvl-college{--accent:var(--yellow);--accent-ink:var(--navy);--tint:var(--yellow-pale);--accent-deep:var(--yellow-deep)}
+body.lvl-primaire{--accent:var(--pink);--accent-ink:#fff;--tint:var(--pink-pale);--accent-deep:var(--pink-deep)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}.muted{color:var(--muted)}
+.login{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top right,#FFF9D2 0,#FFFFFF 40%,#E9EAFB 100%)}
+.login-card{width:min(500px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:34px;box-shadow:0 30px 90px rgba(4,6,120,.18);text-align:center}
+.login-card .admin-logo{width:150px;height:150px;object-fit:contain;margin:0 auto 12px;display:block}
+.login h1{margin:0;color:var(--navy);font-size:25px;letter-spacing:-.3px;line-height:1.15}.login h1 span{display:block;font-size:30px;font-weight:950}
+.republic{font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
+.tag{margin:8px 0 22px;font-size:13px}
+.field{display:grid;gap:7px;margin:11px 0;text-align:left}.field label{font-weight:800;font-size:13px;color:var(--navy)}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px 13px;outline:none;color:var(--text)}
+.field input:focus,.field select:focus,.field textarea:focus,.search input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(4,6,120,.14)}
+.field textarea{min-height:110px;resize:vertical}
+.btn{border:0;border-radius:12px;padding:11px 15px;background:var(--navy);color:#fff;font-weight:850;transition:.18s ease}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.12)}.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn.accent{background:var(--accent);color:var(--accent-ink)}.btn.yellow{background:var(--yellow);color:var(--navy)}
+.btn.ghost{background:var(--tint);color:var(--navy)}.btn.red{background:var(--red)}.btn.small{padding:8px 10px;font-size:12px}
+.notice{padding:11px 13px;border-radius:12px;background:var(--tint);margin:12px 0;font-size:13px;color:var(--navy);text-align:left}
+.notice.danger{background:var(--red-pale);color:#7A1812}.notice.good{background:var(--green-pale);color:#0B5030}
+.app{min-height:100vh}
+.side{position:fixed;inset:0 auto 0 0;width:270px;background:linear-gradient(180deg,#040678 0%,#02034F 100%);color:#fff;padding:18px 14px;z-index:5;overflow:auto;box-shadow:12px 0 35px rgba(4,6,120,.14)}
+.side:after{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--accent)}
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;margin:8px 6px 14px}
+.brand img{width:112px;height:112px;object-fit:contain;flex:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+.brand b{font-size:13px;line-height:1.25;letter-spacing:.2px}.brand b span{display:block;font-size:16px;font-weight:950;color:var(--yellow)}
+.brand small{display:block;color:#C9CBF5;font-size:10px;margin-top:4px}
+.role{margin:0 6px 14px;padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.10);font-size:11px;border:1px solid rgba(252,238,118,.35)}
+.nav{display:grid;gap:4px}
+.nav button{border:0;background:transparent;color:#fff;text-align:left;padding:11px 13px;border-radius:12px;font-weight:750;transition:.16s;display:flex;align-items:center;gap:9px}
+.nav button:hover{background:rgba(255,255,255,.12);transform:translateX(2px)}
+.nav button.active{background:var(--accent);color:var(--accent-ink);box-shadow:0 5px 18px rgba(0,0,0,.2)}
+.nav button .ic{width:22px;text-align:center;opacity:.9}
+.nav .sep{height:1px;background:rgba(255,255,255,.18);margin:8px 6px}
+.nav button.perm{background:rgba(252,238,118,.16);border:1px solid rgba(252,238,118,.5)}
+.nav button.perm.active{background:var(--yellow);color:var(--navy)}
+.main{margin-left:270px;padding:0 26px 30px;max-width:1700px}
+.levelbar{position:sticky;top:0;z-index:4;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 0;background:linear-gradient(180deg,var(--bg) 75%,rgba(247,247,252,0))}
+.lvl-tab{border:2px solid var(--line);background:#fff;border-radius:18px;padding:14px 16px;text-align:left;transition:.18s;box-shadow:0 4px 14px rgba(4,6,120,.06);display:flex;flex-direction:column;gap:3px}
+.lvl-tab b{font-size:21px;letter-spacing:.5px;color:var(--navy)}.lvl-tab small{font-size:11px;color:var(--muted)}
+.lvl-tab.primaire.on{background:linear-gradient(120deg,var(--navy) 0%,var(--navy) 55%,var(--pink) 100%);border-color:var(--pink)}
+.lvl-tab.college.on{background:linear-gradient(120deg,var(--navy) 0%,var(--navy) 62%,var(--yellow) 100%);border-color:var(--yellow)}
+.lvl-tab.on b{color:#fff}.lvl-tab.on small{color:#E4E5FF}
+.lvl-tab:not(.on):hover{border-color:var(--navy);transform:translateY(-1px)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:4px 0 18px}
+.top h2{margin:0;color:var(--navy);font-size:27px;letter-spacing:-.4px}
+.levelchip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:5px 11px;font-size:11px;font-weight:900;background:var(--accent);color:var(--accent-ink);margin-left:8px;vertical-align:middle}
+.section{display:none}.section.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.stat{position:relative;overflow:hidden}.stat:before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:var(--accent)}
+.stat .label{color:var(--muted);font-size:13px}.stat b{display:block;color:var(--navy);font-size:30px;margin-top:7px}.stat .sub{font-size:11px;color:var(--muted);margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.formgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.formgrid4{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.toolbar{display:flex;gap:9px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.search{max-width:380px;flex:1}.search input{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff;outline:none}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+.table{width:100%;border-collapse:collapse;min-width:680px}
+.table th,.table td{padding:10px 12px;border-bottom:1px solid #ECECF7;text-align:left;vertical-align:top;font-size:14px}
+.table th{font-size:11px;color:var(--navy);text-transform:uppercase;background:var(--tint);position:sticky;top:0;white-space:nowrap}
+.table tr:hover td{background:#FBFBFF}.table tr:last-child td{border-bottom:0}.table td.num,.table th.num{text-align:right;white-space:nowrap}
+.table tfoot td{font-weight:900;background:var(--tint);color:var(--navy)}
+.pill{display:inline-flex;padding:5px 9px;border-radius:99px;font-size:10px;font-weight:900;white-space:nowrap}
+.pill.green{background:var(--green-pale);color:#0B5030}.pill.orange{background:var(--orange-pale);color:var(--orange)}
+.pill.red{background:var(--red-pale);color:#7A1812}.pill.gray{background:#E9EAF4;color:#4A4E6C}.pill.navy{background:#E3E4FF;color:var(--navy)}.pill.pink{background:var(--pink-pale);color:var(--pink-deep)}
+.actions{display:flex;gap:5px;flex-wrap:wrap}.empty{text-align:center;padding:25px;color:var(--muted)}
+.section h3{margin-top:0;color:var(--navy)}.hint{font-size:12px;color:var(--muted)}
+.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:900;letter-spacing:2px;color:var(--navy);background:var(--yellow-pale);padding:2px 8px;border-radius:8px}
+.bigcode{font-size:30px;letter-spacing:6px;padding:8px 16px;display:inline-block;margin:6px 0}
+.modal{position:fixed;inset:0;background:rgba(2,3,79,.6);display:grid;place-items:center;padding:20px;z-index:20}
+.modal-card{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;border:1px solid var(--line)}
+.modal-card.wide{width:min(980px,100%)}
+.close{float:right;border:0;background:var(--tint);color:var(--navy);border-radius:10px;padding:7px 10px}
+.danger-zone{border:1px solid #F0CFCC;background:#FFFBFB;border-radius:14px;padding:14px}
+.admin-code-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.admin-code-tabs button{flex:1;min-width:180px}
+.admin-code-panel{margin-top:10px}
+.childrow{display:grid;grid-template-columns:1.6fr 1fr auto;gap:8px;align-items:end;margin:8px 0;padding:10px;border:1px dashed var(--line);border-radius:12px;background:var(--tint)}
+.childrow .field{margin:0}
+.results{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:8px;max-height:300px;overflow-y:auto;background:#fff}
+.results .res{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid #ECECF7;cursor:pointer}
+.results .res:hover{background:var(--tint)}.results .res:last-child{border-bottom:0}
+.results .res.sel{background:var(--tint);outline:2px solid var(--navy);outline-offset:-2px}
+.bar{height:9px;border-radius:99px;background:#E7E8F6;overflow:hidden;min-width:70px}.bar i{display:block;height:100%;background:var(--green);border-radius:99px}
+.bar.warn i{background:var(--accent-deep)}.bar.low i{background:var(--red)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi{border-radius:14px;padding:14px;background:var(--tint);border:1px solid var(--line)}.kpi .l{font-size:12px;color:var(--muted)}.kpi b{display:block;font-size:21px;color:var(--navy);margin-top:4px}
+.dishcard{border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;background:#fff}
+.photos{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.photos img{width:200px;height:150px;object-fit:cover;border-radius:12px;border:2px solid var(--yellow);cursor:zoom-in;background:var(--tint)}
+.photos .noph{width:200px;height:150px;border-radius:12px;border:2px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 12px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:99px;padding:7px 12px;font-size:12px;font-weight:800}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.msgline{display:flex;gap:8px;align-items:flex-start;justify-content:space-between;padding:9px 11px;border-radius:12px;margin:6px 0}
+.msgline.parent{background:var(--tint)}.msgline.teacher{background:#E9EAFD}
+.sectionnote{font-size:12px;color:var(--muted);margin:-6px 0 14px}
+@media(max-width:1100px){.grid,.kpis{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}.side{width:236px}.main{margin-left:236px}.formgrid4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.side{position:static;width:100%;padding:13px}.side:after{display:none}.brand{flex-direction:row;text-align:left}.brand img{width:64px;height:64px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.nav .sep{display:none}.main{margin-left:0;padding:0 14px 24px}.top{align-items:flex-start}.grid,.formgrid,.formgrid3,.formgrid4,.kpis{grid-template-columns:1fr}.table{min-width:800px}.childrow{grid-template-columns:1fr}.lvl-tab b{font-size:17px}.lvl-tab small{display:none}}
+@media print{.side,.levelbar,.toolbar .actions,.no-print{display:none!important}.main{margin:0}}
 </style>
-
-<style>html[data-cycle="primary"] .side{background:linear-gradient(180deg,#071A8C,#02085C)}html[data-cycle="primary"] .nav button.active{background:linear-gradient(90deg,#FFE84A,#F7B7D5);color:#071A8C}html[data-cycle="college"] .side{background:linear-gradient(180deg,#071A8C,#02085C)}html[data-cycle="college"] .nav button.active{background:#FFE84A;color:#071A8C}</style>
 </head>
-<body>
+<body class="lvl-primaire">
 <div id="login" class="login"><div class="login-card">
-  <img class="admin-logo" src="connect_test_logo.png" alt="CONNECT TEST — ÉCOLE"><h1>SAINT JEAN PAUL II</h1><div class="muted tag">COMPLEXE SCOLAIRE<br>SUPER ADMIN · DIRECTION</div>
+  <img class="admin-logo" src="logo_sjp2.png" alt="Complexe Scolaire SAINT JEAN PAUL II">
+  <div class="republic">République Togolaise</div>
+  <h1>Complexe Scolaire<span>SAINT JEAN PAUL II</span></h1>
+  <div class="muted tag">Système de suivi de Scolarité<br>ADMINISTRATION · DIRECTION</div>
   <div class="field"><label>Email Direction</label><input id="email" type="email" autocomplete="username"></div>
-  <div class="field"><label>Mot de passe</label><input id="password" type="password" autocomplete="current-password"></div>
+  <div class="field"><label>Mot de passe</label><input id="password" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"></div>
   <button class="btn" style="width:100%" onclick="login()">SE CONNECTER</button>
   <div id="loginMsg" class="notice hidden"></div>
-  <div class="hint" style="margin-top:18px">Le compte doit être créé dans Supabase Auth. Une fois connecté, l'initialisation Super Admin associe ce compte à CONNECT TEST.</div>
-  <button class="btn lime" style="width:100%;margin-top:10px" onclick="bootstrap()">INITIALISER CE COMPTE SUPER ADMIN</button>
+  <div class="hint" style="margin:18px 0 10px;text-align:left">Le compte Direction est créé dans Supabase &gt; Authentication &gt; Users. À la première connexion, utilisez l'initialisation ci-dessous.</div>
+  <button class="btn yellow" style="width:100%" onclick="bootstrap()">INITIALISER CE COMPTE DIRECTION</button>
 </div></div>
 
 <div id="app" class="app hidden">
-<aside class="side"><div class="brand"><img src="connect_test_logo.png" alt="CONNECT TEST — ÉCOLE"><span>SAINT JEAN PAUL II<small>COMPLEXE SCOLAIRE</small></span></div><div class="role">🔐 Super Admin — Direction</div>
-<div class="nav">
-<button class="active" data-sec="dashboard" data-title="Tableau de bord"><span>▣</span>Tableau de bord</button>
-<button data-sec="students" data-title="Élèves & parents"><span>♙</span>Élèves & parents</button>
-<button data-sec="teachers" data-title="Enseignants"><span>♜</span>Enseignants</button>
-<button data-sec="school" data-title="Classes & matières"><span>◆</span>Classes & matières</button>
-<button data-sec="notes" data-title="Notes"><span>✎</span>Notes</button>
-<button data-sec="news" data-title="Envoyer un message"><span>✉</span>Envoyer un message</button>
-<button data-sec="messages" data-title="Messagerie"><span>✉</span>Messagerie</button>
-<button data-sec="settings" data-title="Administration"><span>⚙</span>Administration</button>
-</div><button class="btn lime" style="width:100%;margin-top:22px" onclick="logout()">DÉCONNEXION</button></aside>
-<main class="main"><div class="top"><div><h2 id="pageTitle">Tableau de bord</h2><div class="muted">Pilotage du Complexe Scolaire SAINT JEAN PAUL II</div></div><div id="userEmail" class="hint"></div></div>
+<aside class="side">
+  <div class="brand"><img src="logo_sjp2.png" alt="Logo"><div><b>Complexe Scolaire<span>SAINT JEAN PAUL II</span></b><small>Système de suivi de Scolarité</small></div></div>
+  <div class="role">🔐 Direction — <span id="roleLevel">Interface Primaire</span></div>
+  <div class="nav">
+    <button class="active" data-sec="dashboard" data-title="Tableau de bord"><span class="ic">▣</span>Tableau de bord</button>
+    <button data-sec="students" data-title="Parents & élèves"><span class="ic">♙</span>Parents &amp; élèves</button>
+    <button data-sec="teachers" data-title="Enseignants"><span class="ic">♜</span>Enseignants</button>
+    <button data-sec="school" data-title="Classes & matières"><span class="ic">◆</span>Classes &amp; matières</button>
+    <button data-sec="notes" data-title="Notes"><span class="ic">✎</span>Notes</button>
+    <button data-sec="fees" data-title="Frais de Scolarité"><span class="ic">₣</span>Frais de Scolarité</button>
+    <button data-sec="news" data-title="Envoyer un message"><span class="ic">✉</span>Envoyer un message</button>
+    <button data-sec="messages" data-title="Messagerie"><span class="ic">💬</span>Messagerie</button>
+    <div class="sep"></div>
+    <button class="perm" data-sec="canteen" data-title="Cantine"><span class="ic">🍲</span>Cantine</button>
+    <button data-sec="settings" data-title="Administration"><span class="ic">⚙</span>Administration</button>
+  </div>
+  <button class="btn yellow" style="width:100%;margin-top:22px" onclick="logout()">DÉCONNEXION</button>
+</aside>
 
-<section id="dashboard" class="section active"><div class="grid">
-<div class="card stat"><div class="label">Élèves</div><b id="kStudents">—</b><div class="sub">Tous niveaux</div></div>
-<div class="card stat"><div class="label">Parents</div><b id="kParents">—</b><div class="sub">Comptes d'accès</div></div>
-<div class="card stat"><div class="label">Enseignants</div><b id="kTeachers">—</b><div class="sub">Personnel enseignant</div></div>
-<div class="card stat"><div class="label">Messages envoyés</div><b id="kNews">—</b><div class="sub">Direction</div></div></div>
-<div class="two" style="margin-top:15px"><div class="card"><h3>Répartition par classe</h3><div id="classStats"></div></div><div class="card"><h3>Activité récente</h3><div id="recentNews"></div></div></div>
+<main class="main">
+<div class="levelbar" id="levelbar">
+  <button id="tabPrimaire" class="lvl-tab primaire" onclick="setLevel('primaire')"><b>PRIMAIRE</b><small>CI1 · CI2 · CP1 · CP2 · CE1 · CE2 · CM1 · CM2</small></button>
+  <button id="tabCollege" class="lvl-tab college" onclick="setLevel('college')"><b>COLLÈGE</b><small>6ième · 5ième · 4ième · 3ième</small></button>
+</div>
+<div class="top"><div><h2><span id="pageTitle">Tableau de bord</span><span class="levelchip" id="levelChip">PRIMAIRE</span></h2><div class="muted" id="pageSub">Pilotage du Complexe Scolaire SAINT JEAN PAUL II</div></div><div id="userEmail" class="hint"></div></div>
+
+<!-- TABLEAU DE BORD -->
+<section id="dashboard" class="section active">
+  <div class="grid">
+    <div class="card stat"><div class="label">Élèves</div><b id="kStudents">—</b><div class="sub" id="kStudentsSub">Niveau actif</div></div>
+    <div class="card stat"><div class="label">Parents</div><b id="kParents">—</b><div class="sub">Comptes d'accès du niveau</div></div>
+    <div class="card stat"><div class="label">Enseignants</div><b id="kTeachers">—</b><div class="sub">Personnel enseignant du niveau</div></div>
+    <div class="card stat"><div class="label">Frais encaissés</div><b id="kFees">—</b><div class="sub" id="kFeesSub">sur le total attendu</div></div>
+  </div>
+  <div class="two" style="margin-top:15px">
+    <div class="card"><h3>Répartition par classe</h3><div id="classStats"></div></div>
+    <div class="card"><h3>Activité récente (messages Direction)</h3><div id="recentNews"></div><h3 style="margin-top:18px">Cantine — aujourd'hui</h3><div id="dashCanteen"></div></div>
+  </div>
 </section>
 
-<section id="students" class="section"><div class="two">
-<div class="card"><h3>Créer un parent</h3><p class="hint">Le compte parent est créé en premier. Un code d'accès unique est généré automatiquement. Après création, vous pouvez inscrire un ou plusieurs enfants rattachés à ce même parent.</p><div class="field"><label>Nom complet du parent</label><input id="soloParentName"></div><div class="field"><label>Téléphone / WhatsApp</label><input id="soloParentPhone"></div><div class="field"><label>Type de parent</label><select id="soloParentRelationship"><option>Père</option><option>Mère</option><option>Tante</option><option>Oncle</option><option>Tuteur</option></select></div><button class="btn lime" onclick="createParent()">CRÉER LE PARENT</button><div id="parentMsg"></div><div id="parentCreated" class="notice hidden"></div></div>
-<div class="card"><h3>Ajouter un enfant à un parent existant</h3><p class="hint">Sélectionnez le parent, puis saisissez l'enfant et sa classe. L'enfant est automatiquement lié au parent sélectionné.</p><div class="field"><label>Parent</label><select id="childParent"></select></div><div class="formgrid"><div class="field"><label>Nom complet de l'élève</label><input id="childStudentName"></div><div class="field"><label>Classe</label><select id="childStudentClass"></select></div><div class="field"><label>Lien avec l’enfant</label><select id="childRelationship"><option>Père</option><option>Mère</option><option>Tante</option><option>Oncle</option><option>Tuteur</option></select></div></div><button class="btn" onclick="addChildToParent()">AJOUTER L'ENFANT</button><div id="childMsg"></div></div></div>
-<div class="card" style="margin-top:15px"><div class="toolbar"><div><h3 style="margin:0">Classes</h3><div class="hint">Cliquez sur une classe pour ouvrir la liste alphabétique de ses élèves.</div></div><div class="search"><input id="classDirectorySearch" placeholder="Rechercher une classe…" oninput="renderClassDirectory()"></div></div><div id="classDirectory" class="grid" style="grid-template-columns:repeat(3,1fr)"></div></div>
-<div class="card" style="margin-top:15px"><div class="toolbar"><h3 style="margin:0">Parents</h3><div class="search"><input id="parentSearch" placeholder="Rechercher un parent…" oninput="renderParents()"></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Parent</th><th>Téléphone</th><th>Enfant(s)</th><th>Actions</th></tr></thead><tbody id="parentsBody"></tbody></table></div></div>
+<!-- PARENTS & ÉLÈVES -->
+<section id="students" class="section">
+  <div class="card">
+    <h3>Enregistrer un parent et ses enfants</h3>
+    <p class="hint">Un élève ne peut pas être créé seul : on enregistre d'abord son parent (Père, Mère, Tante, Oncle ou Tuteur), puis ses enfants inscrits dans les classes du niveau actif. Un code d'accès parent unique est généré automatiquement.</p>
+    <div class="formgrid3">
+      <div class="field"><label>Type de parent</label><select id="pType"><option>Père</option><option>Mère</option><option>Tante</option><option>Oncle</option><option>Tuteur</option></select></div>
+      <div class="field"><label>Nom complet du parent</label><input id="pName" placeholder="Ex. Kodjo Amegah"></div>
+      <div class="field"><label>Téléphone / WhatsApp</label><input id="pPhone" placeholder="Ex. 90 00 00 00"></div>
+    </div>
+    <div class="toolbar" style="margin:10px 0 0"><b style="color:var(--navy)">Enfants inscrits <span class="levelchip levelnow">PRIMAIRE</span></b><button class="btn ghost small" onclick="addChildRow()">+ Ajouter un autre enfant</button></div>
+    <div id="childRows"></div>
+    <div class="row" style="margin-top:10px"><button class="btn accent" onclick="createFamily()">ENREGISTRER LE PARENT ET SES ENFANTS</button></div>
+    <div id="parentMsg"></div><div id="parentCreated" class="notice good hidden"></div>
+  </div>
+
+  <div class="card" style="margin-top:15px">
+    <div class="toolbar"><div><h3 style="margin:0">Rechercher un élève</h3><div class="hint">Tapez le nom : la liste se trie automatiquement. Cliquez sur l'élève pour voir son parent et lui envoyer un message particulier.</div></div><div class="search"><input id="studentSearch" placeholder="Nom de l'élève…" oninput="renderStudentSearch()" autocomplete="off"></div></div>
+    <div id="studentSearchResults"></div>
+  </div>
+
+  <div class="card" style="margin-top:15px"><div class="toolbar"><div><h3 style="margin:0">Classes</h3><div class="hint">Cliquez sur une classe pour ouvrir la liste alphabétique de ses élèves.</div></div></div><div id="classDirectory" class="grid" style="grid-template-columns:repeat(4,1fr)"></div></div>
+
+  <div class="card" style="margin-top:15px"><div class="toolbar"><h3 style="margin:0">Parents du niveau</h3><div class="search"><input id="parentSearch" placeholder="Rechercher un parent ou un enfant…" oninput="renderParents()"></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Parent</th><th>Type</th><th>Téléphone</th><th>Enfant(s)</th><th>Actions</th></tr></thead><tbody id="parentsBody"></tbody></table></div></div>
 </section>
 
+<!-- ENSEIGNANTS -->
 <section id="teachers" class="section"><div class="two">
-<div class="card"><h3>Enregistrer un enseignant</h3><div class="field"><label>Nom complet</label><input id="teacherName"></div><div class="field"><label>Téléphone</label><input id="teacherPhone"></div><button class="btn" onclick="createTeacher()">CRÉER L'ACCÈS ENSEIGNANT</button><div id="teacherMsg"></div></div>
-<div class="card"><h3>Affecter enseignant / classe / matière</h3><div class="field"><label>Enseignant</label><select id="assignTeacher"></select></div><div class="field"><label>Classe</label><select id="assignClass"></select></div><div class="field"><label>Matière</label><select id="assignSubject"></select></div><div class="field"><label>Professeur titulaire de la classe ?</label><select id="assignHome"><option value="false">Non</option><option value="true">Oui</option></select></div><button class="btn lime" onclick="assignTeacher()">ENREGISTRER L'AFFECTATION</button><div id="assignMsg"></div></div></div>
-<div class="card" style="margin-top:15px"><div class="toolbar"><h3 style="margin:0">Enseignants & affectations</h3><div class="search"><input id="teacherSearch" placeholder="Rechercher…" oninput="renderTeachers()"></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Enseignant</th><th>Téléphone</th><th>Classes / matières</th><th>Actions</th></tr></thead><tbody id="teachersBody"></tbody></table></div></div>
+  <div class="card"><h3>Enregistrer un enseignant</h3><p class="hint">L'enseignant est enregistré dans l'interface du niveau actif. Un code d'accès est généré automatiquement.</p><div class="field"><label>Nom complet</label><input id="teacherName"></div><div class="field"><label>Téléphone</label><input id="teacherPhone"></div><button class="btn accent" onclick="createTeacher()">CRÉER L'ACCÈS ENSEIGNANT</button><div id="teacherMsg"></div></div>
+  <div class="card"><h3>Affecter enseignant / classe / matière</h3><div class="field"><label>Enseignant</label><select id="assignTeacher"></select></div><div class="field"><label>Classe</label><select id="assignClass"></select></div><div class="field"><label>Matière</label><select id="assignSubject"></select></div><div class="field"><label>Professeur titulaire de la classe ?</label><select id="assignHome"><option value="false">Non</option><option value="true">Oui</option></select></div><button class="btn" onclick="assignTeacher()">ENREGISTRER L'AFFECTATION</button><div id="assignMsg"></div></div>
+</div>
+<div class="card" style="margin-top:15px"><div class="toolbar"><h3 style="margin:0">Enseignants &amp; affectations</h3><div class="search"><input id="teacherSearch" placeholder="Rechercher…" oninput="renderTeachers()"></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Enseignant</th><th>Téléphone</th><th>Classes / matières</th><th>Actions</th></tr></thead><tbody id="teachersBody"></tbody></table></div></div>
 </section>
 
-<section id="school" class="section"><div class="two"><div class="card"><h3>Classes</h3><p class="hint">La création d’une nouvelle classe est protégée par un mot de passe Direction.</p><div class="row"><input id="newClassName" placeholder="Ex. 6ième" style="flex:1;padding:11px;border:1px solid var(--line);border-radius:11px"><input id="newClassCode" placeholder="Code" style="width:110px;padding:11px;border:1px solid var(--line);border-radius:11px"><button class="btn" onclick="addClass()">Ajouter une classe</button></div><div id="classesList" style="margin-top:14px"></div></div><div class="card"><h3>Matières</h3><div class="row"><input id="newSubject" placeholder="Nom de la matière" style="flex:1;padding:11px;border:1px solid var(--line);border-radius:11px"><button class="btn" onclick="addSubject()">Ajouter</button></div><div id="subjectsList" style="margin-top:14px"></div></div></div>
+<!-- CLASSES & MATIÈRES -->
+<section id="school" class="section"><div class="two">
+  <div class="card"><h3>Classes du niveau</h3><p class="hint">Les classes du Complexe sont fixes : Primaire (CI1 à CM2) et Collège (6ième à 3ième).</p><div id="classesList"></div></div>
+  <div class="card"><h3>Matières</h3><div class="row"><input id="newSubject" placeholder="Nom de la matière" style="flex:1;padding:11px;border:1px solid var(--line);border-radius:11px"><button class="btn" onclick="addSubject()">Ajouter</button></div><div id="subjectsList" style="margin-top:14px"></div></div></div>
 <div class="card" style="margin-top:15px"><h3>Affectations existantes</h3><div class="table-wrap"><table class="table"><thead><tr><th>Enseignant</th><th>Classe</th><th>Matière</th><th>Titulaire</th><th>Action</th></tr></thead><tbody id="assignmentsBody"></tbody></table></div></div></section>
 
-<section id="notes" class="section"><div class="card"><div class="toolbar"><div><h3 style="margin:0">Notes saisies</h3><div class="hint">Contrôle global des devoirs, moyennes de classe et compositions.</div></div><div class="row"><select id="noteClassFilter" onchange="renderNotes()"><option value="">Toutes les classes</option></select><select id="noteTermFilter" onchange="renderNotes()"><option value="">Tous les trimestres</option><option>1er trimestre</option><option>2e trimestre</option><option>3e trimestre</option></select></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Élève</th><th>Classe</th><th>Matière</th><th>Trimestre</th><th>Type</th><th>Note</th><th>Date</th><th>Action</th></tr></thead><tbody id="notesBody"></tbody></table></div></div></section>
+<!-- NOTES -->
+<section id="notes" class="section"><div class="card"><div class="toolbar"><div><h3 style="margin:0">Notes saisies</h3><div class="hint">Contrôle des devoirs, moyennes de classe et compositions du niveau actif.</div></div><div class="row"><select id="noteClassFilter" onchange="renderNotes()"></select><select id="noteTermFilter" onchange="renderNotes()"><option value="">Tous les trimestres</option><option>1er trimestre</option><option>2e trimestre</option><option>3e trimestre</option></select></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Élève</th><th>Classe</th><th>Matière</th><th>Trimestre</th><th>Type</th><th>Note</th><th>Date</th><th>Action</th></tr></thead><tbody id="notesBody"></tbody></table></div></div></section>
 
-<section id="news" class="section"><div class="two"><div class="card"><h3>Envoyer un message</h3><div class="field"><label>Titre</label><input id="newsTitle"></div><div class="field"><label>Importance</label><select id="newsImportance"><option value="urgent">Urgent</option><option value="pas_urgent">Pas urgent</option></select></div><div class="field"><label>Destinataires</label><select id="newsTarget" onchange="changeNewsTarget()"><option value="all_parents">À tous les parents</option><option value="class_parents">Aux parents d'une classe</option><option value="all_teachers">À tous les enseignants</option><option value="teacher">À un enseignant</option><option value="student">À un parent précis (via son élève)</option><option value="canteen">À tout le personnel de cantine</option></select></div><div id="newsTargetField"></div><div class="field"><label>Message</label><textarea id="newsBodyText"></textarea></div><button class="btn" onclick="publishNews()">PUBLIER</button><div id="newsMsg"></div></div><div class="card"><div class="toolbar"><div><h3 style="margin:0">Historique des messages</h3><div class="hint">Sélectionnez un ou plusieurs communiqués pour les retirer des espaces Parents et Enseignants.</div></div><button class="btn red small" onclick="deleteSelectedNews()">Supprimer la sélection</button></div><div class="table-wrap"><table class="table"><thead><tr><th style="width:40px"><input id="newsSelectAll" type="checkbox" title="Tout sélectionner" onchange="toggleAllNews(this.checked)"></th><th>Date</th><th>Titre</th><th>Importance</th><th>Cible</th></tr></thead><tbody id="newsHistory"></tbody></table></div></div></div></section>
+<!-- FRAIS DE SCOLARITÉ -->
+<section id="fees" class="section">
+  <div class="card">
+    <div class="toolbar"><div><h3 style="margin:0">Frais de Scolarité <span class="levelchip levelnow">PRIMAIRE</span></h3><div class="hint">Montants payés par tranches (jusqu'à 15 par élève). Le total à payer est défini pour chaque classe.</div></div>
+      <button class="btn accent" onclick="openClassFeesModal()">⚙ DÉFINIR LE MONTANT TOTAL PAR CLASSE</button></div>
+    <div class="kpis" id="feeKpis"></div>
+  </div>
+  <div class="card" style="margin-top:15px">
+    <h3>Saisir un paiement</h3>
+    <div class="search" style="max-width:520px"><input id="feeSearch" placeholder="Commencez à saisir le nom de l'élève…" oninput="renderFeeSearch()" autocomplete="off"></div>
+    <div id="feeSearchResults"></div>
+    <div id="feeFile"></div>
+  </div>
+  <div class="card" style="margin-top:15px">
+    <div class="toolbar"><div><h3 style="margin:0">Rapports &amp; tris</h3><div class="hint">Filtrez par classe, statut ou montant (ex. élèves ayant payé moins de 15 000 FCFA), triez, puis exportez ou imprimez.</div></div><div class="actions"><button class="btn ghost small" onclick="exportFeesCsv()">Exporter CSV (Excel)</button><button class="btn ghost small" onclick="exportFeesPdf()">Exporter PDF</button><button class="btn ghost small" onclick="window.print()">Imprimer</button></div></div>
+    <div class="chips" id="feeChips"></div>
+    <div class="formgrid4">
+      <div class="field"><label>Classe</label><select id="fClass" onchange="renderFeeReport()"></select></div>
+      <div class="field"><label>Statut</label><select id="fStatus" onchange="renderFeeReport()"><option value="">Tous les statuts</option><option value="done">Soldé</option><option value="unsettled">Non soldé (reste à payer)</option><option value="partial">Paiement partiel</option><option value="none">Aucun paiement</option><option value="nodef">Frais non définis</option></select></div>
+      <div class="field"><label>Trier par</label><select id="fSort" onchange="renderFeeReport()"><option value="name">Nom (A → Z)</option><option value="class">Classe puis nom</option><option value="paid_asc">Payé : du plus petit au plus grand</option><option value="paid_desc">Payé : du plus grand au plus petit</option><option value="rem_desc">Reste : du plus grand au plus petit</option><option value="rem_asc">Reste : du plus petit au plus grand</option><option value="pct_asc">% payé : croissant</option><option value="pct_desc">% payé : décroissant</option><option value="last_desc">Dernier paiement : récent d'abord</option><option value="last_asc">Dernier paiement : ancien / jamais d'abord</option><option value="inst_desc">Nombre de tranches : décroissant</option></select></div>
+      <div class="field"><label>Rechercher un élève / parent</label><input id="fSearch" oninput="renderFeeReport()" placeholder="Nom…"></div>
+      <div class="field"><label>A payé moins de (FCFA)</label><input id="fPaidLt" inputmode="numeric" oninput="renderFeeReport()" placeholder="Ex. 15000"></div>
+      <div class="field"><label>A payé plus de (FCFA)</label><input id="fPaidGt" inputmode="numeric" oninput="renderFeeReport()"></div>
+      <div class="field"><label>Reste à payer plus de (FCFA)</label><input id="fRemGt" inputmode="numeric" oninput="renderFeeReport()"></div>
+      <div class="field"><label>Reste à payer moins de (FCFA)</label><input id="fRemLt" inputmode="numeric" oninput="renderFeeReport()"></div>
+    </div>
+    <div class="row" style="margin:4px 0 12px"><button class="btn ghost small" onclick="resetFeeFilters()">Réinitialiser les filtres</button><span class="hint" id="feeCount"></span></div>
+    <div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Élève</th><th>Classe</th><th class="num">Total à payer</th><th class="num">Payé</th><th class="num">Reste</th><th>Avancement</th><th class="num">Tranches</th><th>Dernier paiement</th><th>Parent(s) / téléphone</th><th>Statut</th></tr></thead><tbody id="feeReportBody"></tbody><tfoot id="feeReportFoot"></tfoot></table></div>
+  </div>
+  <div class="card" style="margin-top:15px"><h3>Récapitulatif par classe</h3><div class="table-wrap"><table class="table"><thead><tr><th>Classe</th><th class="num">Effectif</th><th class="num">Frais / élève</th><th class="num">Total attendu</th><th class="num">Encaissé</th><th class="num">Reste</th><th>Recouvrement</th><th class="num">Soldés</th><th class="num">Partiels</th><th class="num">Aucun paiement</th></tr></thead><tbody id="feeClassBody"></tbody><tfoot id="feeClassFoot"></tfoot></table></div></div>
+</section>
 
-<section id="canteen" class="section"><div class="two"><div class="card"><h3>Enregistrer une employée de cantine</h3><div class="field"><label>Nom complet</label><input id="canteenStaffName"></div><div class="field"><label>Téléphone</label><input id="canteenStaffPhone"></div><button class="btn" onclick="createCanteenStaff()">GÉNÉRER SON CODE D’ACCÈS</button><div id="canteenStaffMsg"></div></div><div class="card"><h3>Personnel de cantine</h3><div id="canteenStaffList"></div></div></div><div class="card" style="margin-top:15px"><div class="toolbar"><h3>Menus et photos du jour</h3><button class="btn ghost small" onclick="loadCanteen()">Actualiser</button></div><div id="canteenMeals"></div></div><div class="card" style="margin-top:15px"><h3>Messages envoyés à la cantine</h3><div id="canteenMessages"></div></div></section>
-<section id="fees" class="section"><div class="two"><div class="card"><h3>Définir les frais par classe</h3><div class="field"><label>Classe</label><select id="feeClass"></select></div><div class="field"><label>Montant total (FCFA)</label><input id="feeTotal" type="number" min="0"></div><button class="btn" onclick="saveClassFee()">ENREGISTRER LE MONTANT</button><div id="feeClassMsg"></div></div><div class="card"><h3>Enregistrer un paiement</h3><div class="field"><label>Rechercher un élève</label><input id="feeStudentSearch" list="feeStudentsList" oninput="filterFeeStudents()" placeholder="Saisir le nom de l’élève"><datalist id="feeStudentsList"></datalist></div><div class="field"><label>Tranche (1 à 15)</label><select id="feeInstallment">'+''.join(f'<option value="{i}">Tranche {i}</option>' for i in range(1,16))+'</select></div><div class="field"><label>Montant payé (FCFA)</label><input id="feeAmount" type="number" min="1"></div><button class="btn" onclick="recordFeePayment()">ENREGISTRER LE PAIEMENT</button><div id="feePaymentMsg"></div></div></div><div class="card" style="margin-top:15px"><div class="toolbar"><h3>Rapport avancé des paiements</h3><select id="feeReportClass" onchange="renderFeeReport()"><option value="">Toutes les classes</option></select><input id="feeThreshold" type="number" value="15000" placeholder="Seuil FCFA" oninput="renderFeeReport()"></div><div class="hint">Filtre les élèves ayant payé moins que le seuil. Le rapport affiche dû, payé, reste et taux de règlement.</div><div class="table-wrap"><table class="table"><thead><tr><th>Élève</th><th>Classe</th><th>Dû (FCFA)</th><th>Payé (FCFA)</th><th>Reste (FCFA)</th><th>Taux</th></tr></thead><tbody id="feeReportBody"></tbody></table></div></div></section>
-<section id="messages" class="section"><div class="card"><div class="toolbar"><div><h3 style="margin:0">Messagerie interne</h3><div class="hint">Lecture des conversations Parent ↔ Enseignant liées à un élève.</div></div><button class="btn ghost small" onclick="loadMessages()">Actualiser</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Élève</th><th>Parent</th><th>Enseignant</th><th>Messages</th><th>Dernier message</th><th>Date</th><th>Action</th></tr></thead><tbody id="messagesBody"></tbody></table></div></div></section>
+<!-- ENVOYER UN MESSAGE -->
+<section id="news" class="section"><div class="two"><div class="card"><h3>Envoyer un message</h3>
+  <div class="field"><label>Titre</label><input id="newsTitle"></div>
+  <div class="field"><label>Importance</label><select id="newsImportance"><option value="urgent">Urgent</option><option value="pas_urgent">Pas urgent</option></select></div>
+  <div class="field"><label>Destinataires</label><select id="newsTarget" onchange="changeNewsTarget()"></select></div>
+  <div id="newsTargetField"></div>
+  <div class="field"><label>Message</label><textarea id="newsBodyText"></textarea></div>
+  <button class="btn accent" onclick="publishNews()">ENVOYER</button><div id="newsMsg"></div></div>
+  <div class="card"><div class="toolbar"><div><h3 style="margin:0">Historique des messages</h3><div class="hint">Sélectionnez un ou plusieurs messages pour les retirer des espaces concernés.</div></div><button class="btn red small" onclick="deleteSelectedNews()">Supprimer la sélection</button></div><div class="table-wrap"><table class="table"><thead><tr><th style="width:40px"><input id="newsSelectAll" type="checkbox" title="Tout sélectionner" onchange="toggleAllNews(this.checked)"></th><th>Date</th><th>Titre</th><th>Importance</th><th>Cible</th></tr></thead><tbody id="newsHistory"></tbody></table></div></div></div></section>
 
+<!-- MESSAGERIE -->
+<section id="messages" class="section"><div class="card"><div class="toolbar"><div><h3 style="margin:0">Messagerie interne Parent ↔ Enseignant</h3><div class="hint">Tous les échanges. Ouvrez une conversation pour lire les messages et en supprimer.</div></div><div class="row"><select id="msgLevelFilter" onchange="renderMessagesList()"><option value="">Tous les niveaux</option><option value="primaire">Primaire</option><option value="college">Collège</option></select><button class="btn ghost small" onclick="loadMessages()">Actualiser</button></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Élève</th><th>Classe</th><th>Parent</th><th>Enseignant</th><th class="num">Msgs</th><th>Dernier message</th><th>Date</th><th>Actions</th></tr></thead><tbody id="messagesBody"></tbody></table></div></div></section>
+
+<!-- CANTINE (permanent) -->
+<section id="canteen" class="section">
+  <p class="sectionnote">🍲 Cette section est commune au Primaire et au Collège.</p>
+  <div class="two">
+    <div class="card"><h3>Enregistrer une personne de la cantine</h3><p class="hint">Un code d'accès (6 caractères) est généré automatiquement. Elle aura son espace pour saisir le menu du jour et ajouter 2 photos du plat.</p><div class="field"><label>Nom complet</label><input id="canteenName"></div><div class="field"><label>Téléphone</label><input id="canteenPhone"></div><button class="btn accent" onclick="createCanteen()">CRÉER L'ACCÈS CANTINE</button><div id="canteenMsg"></div></div>
+    <div class="card"><h3>Envoyer un message à toute la cantine</h3><p class="hint">Un seul message, un seul clic : toutes les personnes de la cantine le reçoivent.</p><div class="field"><label>Titre</label><input id="canteenMsgTitle"></div><div class="field"><label>Importance</label><select id="canteenMsgImp"><option value="pas_urgent">Pas urgent</option><option value="urgent">Urgent</option></select></div><div class="field"><label>Message</label><textarea id="canteenMsgBody" style="min-height:80px"></textarea></div><button class="btn" onclick="sendCanteenMessage()">ENVOYER À LA CANTINE</button><div id="canteenSendMsg"></div></div>
+  </div>
+  <div class="card" style="margin-top:15px"><h3>Personnel de la cantine</h3><div class="table-wrap"><table class="table"><thead><tr><th>Nom</th><th>Téléphone</th><th>Code d'accès</th><th>Actions</th></tr></thead><tbody id="canteenBody"></tbody></table></div></div>
+  <div class="card" style="margin-top:15px"><div class="toolbar"><div><h3 style="margin:0">Menus &amp; photos de la semaine</h3><div class="hint">Menus et photos saisis par la cantine. Effacement automatique chaque dimanche à 00h GMT.</div></div><button class="btn ghost small" onclick="loadCanteen()">Actualiser</button></div><div id="canteenMenus"></div></div>
+</section>
+
+<!-- ADMINISTRATION -->
 <section id="settings" class="section">
 <div class="two">
-  <div class="card"><h3>Compte Super Admin</h3><p id="adminInfo" class="hint"></p><button class="btn" onclick="bootstrap()">RÉACTIVER / INITIALISER</button></div>
-  <div class="card"><h3>Actualisation</h3><p class="hint">Recharge toutes les données de l'administration.</p><button class="btn lime" onclick="loadAll()">ACTUALISER TOUT</button></div>
+  <div class="card"><h3>Compte Direction</h3><p id="adminInfo" class="hint"></p><button class="btn" onclick="bootstrap()">RÉACTIVER / INITIALISER</button></div>
+  <div class="card"><h3>Actualisation</h3><p class="hint">Recharge toutes les données de l'administration.</p><button class="btn accent" onclick="loadAll()">ACTUALISER TOUT</button></div>
 </div>
 <div class="card" style="margin-top:15px">
   <div><h3 style="margin:0">Registre des codes d'accès</h3><div class="hint">Choisissez le type de compte pour afficher sa liste alphabétique. L'export PDF se fait depuis la liste sélectionnée.</div></div>
-  <div class="admin-code-tabs">
-    <button class="btn" onclick="showAccessCodeGroup('parent')">CODES PARENT</button>
-    <button class="btn lime" onclick="showAccessCodeGroup('teacher')">CODES ENSEIGNANTS</button>
-  </div>
+  <div class="admin-code-tabs"><button class="btn" onclick="showAccessCodeGroup('parent')">CODES PARENTS</button><button class="btn yellow" onclick="showAccessCodeGroup('teacher')">CODES ENSEIGNANTS</button><button class="btn accent" onclick="showAccessCodeGroup('canteen')">CODES CANTINE</button></div>
   <div id="codesPanel" class="admin-code-panel hidden">
-    <div class="toolbar"><div><h3 id="codesPanelTitle" style="margin:0"></h3><div id="codesPanelHint" class="hint"></div></div><div class="actions"><button class="btn ghost small" onclick="loadAccessCodes(true)">Actualiser</button><button class="btn lime small" onclick="exportAccessCodesPdf()">Exporter en PDF</button></div></div>
+    <div class="toolbar"><div><h3 id="codesPanelTitle" style="margin:0"></h3><div id="codesPanelHint" class="hint"></div></div><div class="actions"><button class="btn ghost small" onclick="loadAccessCodes(true)">Actualiser</button><button class="btn yellow small" onclick="exportAccessCodesPdf()">Exporter en PDF</button></div></div>
     <div id="codesMsg"></div>
     <div class="table-wrap"><table class="table"><thead><tr><th>Nom</th><th>Téléphone</th><th>Code</th><th>Généré le</th><th>Statut</th></tr></thead><tbody id="codesBody"></tbody></table></div>
   </div>
@@ -105,14 +294,68 @@
 </section>
 </main></div>
 
-<div id="modal" class="modal hidden"><div class="modal-card"><button class="close" onclick="closeModal()">Fermer</button><div id="modalContent"></div></div></div>
+<div id="modal" class="modal hidden" onclick="if(event.target===this)closeModal()"><div class="modal-card" id="modalCard"><button class="close" onclick="closeModal()">Fermer</button><div id="modalContent"></div></div></div>
 <script>
+/* ================= CONFIGURATION SUPABASE =================
+   Remplacez ces deux valeurs si vous utilisez votre propre projet Supabase.
+   (la clé « Publishable / anon » est faite pour être publique ; jamais de clé service_role ici) */
 const CONFIG={url:'https://aexuugygfuesjumtjnmk.supabase.co',key:'sb_publishable_68ZJ936KFGDCeDARp4J3dg_kyyAZwmV'};
-const sb=supabase.createClient(CONFIG.url,CONFIG.key);let classes=[],subjects=[],parents=[],teachers=[],students=[],assignments=[],notes=[],news=[],conversations=[],messages=[],feeRows=[],canteenStaff=[];let activeCycle="primary";const $=id=>document.getElementById(id);
+const sb=supabase.createClient(CONFIG.url,CONFIG.key);
+const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-function notice(id,text,good=true){const e=$(id);if(!e)return;e.className='notice '+(good?'':'danger');e.textContent=text}
-function fill(id,items,placeholder=''){const e=$(id);if(!e)return;e.innerHTML=(placeholder?`<option value="">${esc(placeholder)}</option>`:'')+items.map(x=>`<option value="${esc(x[0])}">${esc(x[1])}</option>`).join('')}
-function pill(v){const label=v==='urgent'||v==='rouge'?'Urgent':v==='pas_urgent'||v==='vert'||v==='orange'?'Pas urgent':v;const cls=(v==='urgent'||v==='rouge')?'red':(v==='pas_urgent'||v==='vert'||v==='orange')?'green':'gray';return `<span class="pill ${cls}">${esc(label)}</span>`}
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const fmtN=n=>Number(n||0).toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g,' ');
+const money=n=>fmtN(n)+' FCFA';
+const fmtDate=d=>{if(!d)return '—';const s=String(d);return s.length===10?new Date(s+'T00:00:00Z').toLocaleDateString('fr-FR',{timeZone:'UTC'}):new Date(s).toLocaleDateString('fr-FR')};
+const fmtDT=d=>d?new Date(d).toLocaleString('fr-FR'):'—';
+const numVal=id=>{const v=String($(id)?.value||'').replace(/[\s\u202f\u00a0]/g,'').replace(',','.');return v===''?null:Number(v)};
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const levelName=l=>l==='primaire'?'Primaire':'Collège';
+
+let LEVEL=(()=>{try{return localStorage.getItem('sjp2_level')==='college'?'college':'primaire'}catch(e){return 'primaire'}})();
+let classes=[],subjects=[],parents=[],teachers=[],canteenStaff=[],students=[],links=[],assignments=[],notes=[],news=[],conversations=[],feeReport=[],classFees=[],todayMenu=null,accessCodes=[];
+let newsStudentId=null;
+
+function notice(id,text,good=true){const e=$(id);if(!e)return;e.className='notice '+(good?'good':'danger');e.textContent=text}
+function fill(id,items,placeholder=''){const e=$(id);if(!e)return;const keep=e.value;e.innerHTML=(placeholder?`<option value="">${esc(placeholder)}</option>`:'')+items.map(x=>`<option value="${esc(x[0])}">${esc(x[1])}</option>`).join('');if(keep&&[...e.options].some(o=>o.value===keep))e.value=keep}
+function pill(v){const label=v==='urgent'?'Urgent':v==='pas_urgent'?'Pas urgent':v;const cls=v==='urgent'?'red':v==='pas_urgent'?'green':'gray';return `<span class="pill ${cls}">${esc(label)}</span>`}
+async function fetchAll(make){let out=[],from=0;const step=1000;for(;;){const r=await make().range(from,from+step-1);if(r.error)throw r.error;const d=r.data||[];out=out.concat(d);if(d.length<step)break;from+=step}return out}
+
+/* ---------- aides niveau actif ---------- */
+const lc=()=>classes.filter(c=>c.level===LEVEL);
+const lcIds=()=>new Set(lc().map(c=>c.id));
+const ls=()=>{const ids=lcIds();return students.filter(s=>ids.has(s.class_id))};
+const kidsOf=pid=>links.filter(x=>x.parent_id===pid).map(x=>students.find(s=>s.id===x.student_id)).filter(Boolean);
+const parentsOf=sid=>links.filter(x=>x.student_id===sid).map(x=>parents.find(p=>p.id===x.parent_id)).filter(Boolean);
+const lp=()=>{const ids=lcIds();return parents.filter(p=>p.registered_level===LEVEL||kidsOf(p.id).some(k=>ids.has(k.class_id)))};
+const lt=()=>{const ids=lcIds();return teachers.filter(t=>t.registered_level===LEVEL||assignments.some(a=>a.teacher_id===t.id&&ids.has(a.class_id)))};
+const className=id=>classes.find(c=>c.id===id)?.name||'';
+const byName=(a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'fr',{sensitivity:'base'});
+function searchStudents(term,pool){const words=norm(term).split(/\s+/).filter(Boolean);if(!words.length)return [];return pool.map(s=>({s,n:norm(s.full_name)})).filter(x=>words.every(w=>x.n.includes(w))).sort((a,b)=>{const t=words[0];const as=a.n.startsWith(t)?0:1,bs=b.n.startsWith(t)?0:1;return as-bs||a.n.localeCompare(b.n,'fr')}).slice(0,40).map(x=>x.s)}
+function classOptions(selectedId){const mk=lv=>classes.filter(c=>c.level===lv).map(c=>`<option value="${c.id}"${c.id===selectedId?' selected':''}>${esc(c.name)}</option>`).join('');const order=LEVEL==='primaire'?['primaire','college']:['college','primaire'];return order.map(lv=>`<optgroup label="${levelName(lv)}">${mk(lv)}</optgroup>`).join('')}
+
+/* ---------- thème / niveau ---------- */
+function applyTheme(){
+  document.body.classList.toggle('lvl-primaire',LEVEL==='primaire');
+  document.body.classList.toggle('lvl-college',LEVEL==='college');
+  $('tabPrimaire').classList.toggle('on',LEVEL==='primaire');
+  $('tabCollege').classList.toggle('on',LEVEL==='college');
+  const lab=LEVEL==='primaire'?'PRIMAIRE':'COLLÈGE';
+  $('levelChip').textContent=lab;
+  document.querySelectorAll('.levelnow').forEach(e=>e.textContent=lab);
+  $('roleLevel').textContent='Interface '+levelName(LEVEL);
+}
+function setLevel(l){
+  LEVEL=l;try{localStorage.setItem('sjp2_level',l)}catch(e){}
+  applyTheme();newsStudentId=null;feeOpenStudent=null;
+  if($('feeFile'))$('feeFile').innerHTML='';
+  if($('feeSearch'))$('feeSearch').value='';
+  if($('feeSearchResults'))$('feeSearchResults').innerHTML='';
+  if($('studentSearch'))$('studentSearch').value='';
+  renderAll();
+}
+
+/* ---------- connexion ---------- */
 async function login(){
   const email=$('email').value.trim(),password=$('password').value;
   if(!email||!password)return notice('loginMsg','Saisissez email et mot de passe.',false);
@@ -125,17 +368,15 @@ async function login(){
     const b=await sb.rpc('bootstrap_admin',{p_email:u.email||email});
     if(b.error)return notice('loginMsg','Connexion réussie, mais activation Direction impossible : '+b.error.message,false);
     await start();
-  }catch(e){
-    notice('loginMsg','Erreur inattendue : '+(e?.message||e),false);
-  }
+  }catch(e){notice('loginMsg','Erreur inattendue : '+(e?.message||e),false)}
 }
 async function bootstrap(){
   const email=$('email').value.trim(),password=$('password').value;
-  if(!email||!password)return notice('loginMsg','Saisissez email et mot de passe.',false);
-  notice('loginMsg','Initialisation en cours…',true);
   try{
-    let {data,error}=await sb.auth.getSession();
+    let {data}=await sb.auth.getSession();
     if(!data.session){
+      if(!email||!password)return notice('loginMsg','Saisissez email et mot de passe.',false);
+      notice('loginMsg','Initialisation en cours…',true);
       const r=await sb.auth.signInWithPassword({email,password});
       if(r.error)return notice('loginMsg','Connexion refusée : '+r.error.message,false);
     }
@@ -143,105 +384,556 @@ async function bootstrap(){
     if(!u)return notice('loginMsg','Impossible de récupérer le compte connecté.',false);
     const r2=await sb.rpc('bootstrap_admin',{p_email:u.email||email});
     if(r2.error)return notice('loginMsg','Activation Direction impossible : '+r2.error.message,false);
-    notice('loginMsg','Compte Super Admin activé avec succès.',true);
+    if(!$('login').classList.contains('hidden'))notice('loginMsg','Compte Direction activé avec succès.',true);else alert('Compte Direction activé.');
     await start();
-  }catch(e){
-    notice('loginMsg','Erreur inattendue : '+(e?.message||e),false);
-  }
+  }catch(e){notice('loginMsg','Erreur inattendue : '+(e?.message||e),false)}
 }
-async function start(){const {data:{user}}=await sb.auth.getUser();if(!user)return;await ensureParentLinks();$('login').classList.add('hidden');$('app').classList.remove('hidden');$('userEmail').textContent=user.email||'Direction';$('adminInfo').textContent='Compte connecté : '+(user.email||'');document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.sec));await loadAll()}
+async function start(){
+  const {data:{user}}=await sb.auth.getUser();if(!user)return;
+  $('login').classList.add('hidden');$('app').classList.remove('hidden');
+  $('userEmail').textContent=user.email||'Direction';$('adminInfo').textContent='Compte connecté : '+(user.email||'');
+  document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>show(b.dataset.sec));
+  applyTheme();resetChildRows();await loadAll();
+}
 async function logout(){await sb.auth.signOut();location.reload()}
-function show(id){document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');const b=document.querySelector(`[data-sec="${id}"]`);if(b)b.classList.add('active');$('pageTitle').textContent=b?(b.dataset.title||id):id;if(id==='messages')loadMessages();if(id==='canteen')loadCanteen();if(id==='fees')loadFeeReport()}
-async function loadAll(){
- const q=await Promise.all([
-  sb.from('classes').select('*').order('name'),sb.from('subjects').select('*').order('name'),sb.from('parents').select('id,full_name,phone,created_at').order('full_name'),
-  sb.from('teachers').select('id,full_name,phone,created_at').order('full_name'),sb.from('students').select('id,full_name,class_id,classes(id,name)').order('full_name'),
-  sb.from('teacher_assignments').select('id,teacher_id,class_id,subject_id,is_homeroom,teachers(id,full_name),classes(id,name),subjects(id,name)').order('created_at'),
-  sb.from('notes').select('id,student_id,teacher_assignment_id,term,note_type,value,title,created_at,students(full_name,class_id,classes(name)),teacher_assignments(subjects(name),teachers(full_name))').order('created_at',{ascending:false}).limit(1000),
-  sb.from('announcements').select('*').order('created_at',{ascending:false}),
-  sb.from('conversations').select('id,parent_id,teacher_id,student_id,created_at,parents(full_name),teachers(full_name),students(full_name)').order('created_at',{ascending:false})
- ]);
- classes=q[0].data||[];subjects=q[1].data||[];parents=q[2].data||[];teachers=q[3].data||[];students=q[4].data||[];assignments=q[5].data||[];notes=q[6].data||[];news=q[7].data||[];conversations=q[8].data||[];
- await ensureParentLinks();
- fill('childParent',parents.map(x=>[x.id,x.full_name]));fill('childStudentClass',classes.map(x=>[x.id,x.name]));fill('assignClass',classes.map(x=>[x.id,x.name]));fill('assignSubject',subjects.map(x=>[x.id,x.name]));fill('assignTeacher',teachers.map(x=>[x.id,x.full_name]));fill('noteClassFilter',classes.map(x=>[x.id,x.name]),'Toutes les classes');
- $('kStudents').textContent=students.length;$('kParents').textContent=parents.length;$('kTeachers').textContent=teachers.length;$('kNews').textContent=news.length;
- renderStudents();renderParents();renderTeachers();renderSchool();renderAssignments();renderNotes();renderNews();renderClassStats();renderRecentNews();renderClassDirectory();changeNewsTarget();loadAccessCodes();fill('feeClass',classes.map(x=>[x.id,x.name]));fill('feeReportClass',classes.map(x=>[x.id,x.name]),'Toutes les classes');fill('feeStudentsList',students.map(x=>[x.id,x.full_name]));
+const SUBS={dashboard:'Pilotage du Complexe Scolaire SAINT JEAN PAUL II',students:'Un parent d’abord, puis ses enfants inscrits',teachers:'Enregistrement et affectation des enseignants',school:'Classes du Complexe, matières et affectations',notes:'Contrôle des notes saisies',fees:'Suivi des paiements par tranches',news:'Communiqués de la Direction',messages:'Échanges Parent ↔ Enseignant',canteen:'Personnel, menus du jour et photos des plats',settings:'Comptes et codes d’accès'};
+function show(id){
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  $(id).classList.add('active');
+  const b=document.querySelector(`[data-sec="${id}"]`);if(b)b.classList.add('active');
+  $('pageTitle').textContent=b?(b.dataset.title||id):id;
+  $('pageSub').textContent=SUBS[id]||'';
+  const common=id==='canteen'||id==='settings';
+  $('levelChip').classList.toggle('hidden',common);
+  if(id==='messages')loadMessages();
+  if(id==='canteen')loadCanteen();
 }
-function renderClassStats(){const box=$('classStats');box.innerHTML=classes.map(c=>{const n=students.filter(s=>s.class_id===c.id).length;return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #F2F5F9"><span>${esc(c.name)}</span><b>${n}</b></div>`}).join('')||'<div class="empty">Aucune classe</div>'}
-function renderRecentNews(){const box=$('recentNews');box.innerHTML=news.slice(0,5).map(n=>`<div style="padding:9px 0;border-bottom:1px solid #F2F5F9"><div class="row" style="justify-content:space-between"><b>${esc(n.title)}</b>${pill(n.importance)}</div><div class="hint">${new Date(n.created_at).toLocaleString('fr-FR')}</div></div>`).join('')||'<div class="empty">Aucun message</div>'}
-function renderClassDirectory(){const term=($('classDirectorySearch')?.value||'').toLowerCase();const allowed=activeCycle==='primary'?['CI1','CI2','CP1','CP2','CE1','CE2','CM1','CM2']:['6ième','5ième','4ième','3ième'];const list=classes.filter(c=>allowed.includes(c.name)&&`${c.name} ${c.code||''}`.toLowerCase().includes(term));$('classDirectory').innerHTML=list.map(c=>{const count=students.filter(s=>s.class_id===c.id).length;return `<div class="card" style="cursor:pointer" onclick="viewClassStudents('${c.id}')"><div class="row" style="justify-content:space-between"><div><b style="font-size:18px;color:var(--g)">${esc(c.name)}</b><div class="hint">Code : ${esc(c.code||'—')}</div></div><span class="pill green">${count} élève${count>1?'s':''}</span></div><div class="hint" style="margin-top:10px">Voir la liste alphabétique →</div></div>`}).join('')||'<div class="empty">Aucune classe trouvée.</div>'}
-function renderStudents(){renderClassDirectory()}
-function studentsParents(studentId){return parents.filter(p=>students.some(s=>false)||false).filter(p=>{return !!assignParentLink(studentId,p.id)})}
-function assignParentLink(studentId,parentId){return window.parentLinks?.some(x=>x.student_id===studentId&&x.parent_id===parentId)}
-async function ensureParentLinks(){const r=await sb.from('student_parents').select('student_id,parent_id,relationship');window.parentLinks=r.data||[]}
-function renderParents(){const term=($('parentSearch')?.value||'').toLowerCase();const rows=parents.filter(p=>`${p.full_name} ${p.phone||''}`.toLowerCase().includes(term)).map(p=>{const kids=(window.parentLinks||[]).filter(x=>x.parent_id===p.id).map(x=>students.find(s=>s.id===x.student_id)).filter(Boolean);return `<tr><td><b>${esc(p.full_name)}</b></td><td>${esc(p.phone||'—')}</td><td>${kids.map(s=>esc(s.full_name)).join('<br>')||'<span class="hint">Aucun enfant inscrit</span>'}</td><td><div class="actions"><button class="btn small" onclick="addChildModal('${p.id}')">Ajouter enfant</button><button class="btn ghost small" onclick="resetParent('${p.id}')">Nouveau code</button><button class="btn ghost small" onclick="viewParent('${p.id}')">Voir</button></div></td></tr>`}).join('');$('parentsBody').innerHTML=rows||'<tr><td colspan="4" class="empty">Aucun parent trouvé.</td></tr>'}
-function renderTeachers(){const term=($('teacherSearch')?.value||'').toLowerCase();$('teachersBody').innerHTML=teachers.filter(t=>`${t.full_name} ${t.phone||''}`.toLowerCase().includes(term)).map(t=>{const a=assignments.filter(x=>x.teacher_id===t.id);return `<tr><td><b>${esc(t.full_name)}</b></td><td>${esc(t.phone||'—')}</td><td>${a.map(x=>`${esc(x.classes?.name||'')} — ${esc(x.subjects?.name||'')}${x.is_homeroom?' <span class="pill green">Titulaire</span>':''}`).join('<br>')||'Aucune affectation'}</td><td><div class="actions"><button class="btn small" onclick="resetTeacher('${t.id}')">Nouveau code</button></div></td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Aucun enseignant.</td></tr>'}
-function renderSchool(){ $('classesList').innerHTML=classes.map(c=>`<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid #F2F5F9"><span><b>${esc(c.name)}</b> <span class="pill gray">${esc(c.code)}</span></span><button class="btn red small" onclick="deleteClass('${c.id}')">Supprimer</button></div>`).join('')||'<div class="empty">Aucune classe</div>'; $('subjectsList').innerHTML=subjects.map(s=>`<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid #F2F5F9"><b>${esc(s.name)}</b><button class="btn red small" onclick="deleteSubject('${s.id}')">Supprimer</button></div>`).join('')||'<div class="empty">Aucune matière</div>' }
-function renderAssignments(){$('assignmentsBody').innerHTML=assignments.map(a=>`<tr><td>${esc(a.teachers?.full_name||'')}</td><td>${esc(a.classes?.name||'')}</td><td>${esc(a.subjects?.name||'')}</td><td>${a.is_homeroom?pill('vert'):'Non'}</td><td><div class="actions"><button class="btn small" onclick="editAssignment('${a.id}')">Modifier</button><button class="btn red small" onclick="deleteAssignment('${a.id}')">Retirer</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Aucune affectation.</td></tr>'}
-function renderNotes(){const cf=$('noteClassFilter')?.value||'',tf=$('noteTermFilter')?.value||'';const arr=notes.filter(n=>(!cf||n.students?.class_id===cf)&&(!tf||n.term===tf));$('notesBody').innerHTML=arr.map(n=>`<tr><td>${esc(n.students?.full_name||'')}</td><td>${esc(n.students?.classes?.name||'')}</td><td>${esc(n.teacher_assignments?.subjects?.name||'')}</td><td>${esc(n.term)}</td><td>${esc(n.note_type)}</td><td><b>${esc(n.value)}/20</b></td><td>${new Date(n.created_at).toLocaleString('fr-FR')}</td><td><button class="btn red small" onclick="deleteNote('${n.id}')">Supprimer</button></td></tr>`).join('')||'<tr><td colspan="8" class="empty">Aucune note.</td></tr>'}
-function targetLabel(n){if(n.target_type==='all_parents')return 'À tous les parents';if(n.target_type==='class_parents')return 'Parents de '+(classes.find(c=>c.id===n.class_id)?.name||'la classe');if(n.target_type==='all_teachers')return 'À tous les enseignants';if(n.target_type==='teacher')return 'Enseignant : '+(teachers.find(t=>t.id===n.teacher_id)?.full_name||'enseignant');if(n.target_type==='all')return 'Tous';if(n.target_type==='class')return classes.find(c=>c.id===n.class_id)?.name||'Classe';if(n.target_type==='student')return students.find(s=>s.id===n.student_id)?.full_name||'Élève';return parents.find(p=>p.id===n.parent_id)?.full_name||'Parent'}
-function renderNews(){ $('newsHistory').innerHTML=news.map(n=>`<tr><td><input class="news-select" type="checkbox" value="${n.id}" onchange="syncNewsSelection()" aria-label="Sélectionner ${esc(n.title)}"></td><td>${new Date(n.created_at).toLocaleString('fr-FR')}</td><td><b>${esc(n.title)}</b></td><td>${pill(n.importance)}</td><td>${esc(targetLabel(n))}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Aucun message.</td></tr>';syncNewsSelection() }
-async function createParent(){const n=$('soloParentName').value.trim(),p=$('soloParentPhone').value.trim();if(!n)return notice('parentMsg','Nom obligatoire.',false);const r=await sb.rpc('admin_create_parent',{p_full_name:n,p_phone:p||null,p_relationship:$('soloParentRelationship').value});if(r.error)return notice('parentMsg',r.error.message,false);const code=r.data?.parent_code||'—';notice('parentMsg',`Parent créé. CODE À REMETTRE : ${code}`);$('soloParentName').value='';$('soloParentPhone').value='';$('parentCreated').classList.remove('hidden');$('parentCreated').innerHTML=`<b>Parent créé avec succès.</b><br>Code d'accès : <span class="code">${esc(code)}</span><br><button class="btn small" style="margin-top:9px" onclick="addChildModal('${r.data.parent_id}')">AJOUTER UN ENFANT</button>`;await loadAll()}
-async function addChildToParent(){const pid=$('childParent').value,name=$('childStudentName').value.trim(),cid=$('childStudentClass').value;if(!pid||!name||!cid)return notice('childMsg','Sélectionnez le parent et renseignez le nom de l’élève et la classe.',false);const r=await sb.rpc('admin_create_student_for_parent',{p_student_full_name:name,p_class_id:cid,p_parent_id:pid,p_relationship:$('childRelationship')?.value||'Père'});if(r.error)return notice('childMsg',r.error.message,false);notice('childMsg','Enfant ajouté et rattaché au parent.');$('childStudentName').value='';await loadAll()}
-function addChildModal(parentId){const p=parents.find(x=>x.id===parentId);openModal(`<h2>Ajouter un enfant</h2><p class="muted">Parent : <b>${esc(p?.full_name||'')}</b>${p?.phone?' · '+esc(p.phone):''}</p><div class="field"><label>Nom complet de l'élève</label><input id="modalChildName"></div><div class="field"><label>Classe</label><select id="modalChildClass"></select></div><div class="field"><label>Lien avec l’enfant</label><select id="modalChildRelationship"><option>Père</option><option>Mère</option><option>Tante</option><option>Oncle</option><option>Tuteur</option></select></div><div id="modalChildMsg"></div><button class="btn" onclick="saveChildModal('${parentId}')">AJOUTER L'ENFANT</button><p class="hint" style="margin-top:12px">Après l'ajout, vous pouvez fermer cette fenêtre et ajouter d'autres enfants au même parent.</p>`);fill('modalChildClass',classes.map(x=>[x.id,x.name]))}
-async function saveChildModal(parentId){const name=$('modalChildName').value.trim(),cid=$('modalChildClass').value;if(!name||!cid)return notice('modalChildMsg','Nom de l’élève et classe obligatoires.',false);const r=await sb.rpc('admin_create_student_for_parent',{p_student_full_name:name,p_class_id:cid,p_parent_id:parentId,p_relationship:$('modalChildRelationship')?.value||'Père'});if(r.error)return notice('modalChildMsg',r.error.message,false);notice('modalChildMsg','Enfant ajouté avec succès.');$('modalChildName').value='';await loadAll()}
-async function resetParent(id){const r=await sb.rpc('admin_reset_parent_code',{p_parent_id:id});if(r.error)return alert(r.error.message);alert('Nouveau code parent : '+r.data.parent_code)}
-async function createTeacher(){const n=$('teacherName').value.trim(),p=$('teacherPhone').value.trim();if(!n)return notice('teacherMsg','Nom obligatoire.',false);const r=await sb.rpc('admin_create_teacher',{p_full_name:n,p_phone:p||null,p_relationship:$('soloParentRelationship').value});if(r.error)return notice('teacherMsg',r.error.message,false);notice('teacherMsg',`Enseignant créé. CODE À REMETTRE : ${r.data.teacher_code}`);$('teacherName').value='';$('teacherPhone').value='';await loadAll()}
-async function resetTeacher(id){const r=await sb.rpc('admin_reset_teacher_code',{p_teacher_id:id});if(r.error)return alert(r.error.message);alert('Nouveau code enseignant : '+r.data.teacher_code)}
-async function assignTeacher(){const r=await sb.rpc('admin_assign_teacher',{p_teacher_id:$('assignTeacher').value,p_class_id:$('assignClass').value,p_subject_id:$('assignSubject').value,p_is_homeroom:$('assignHome').value==='true'});if(r.error)return notice('assignMsg',r.error.message,false);notice('assignMsg','Affectation enregistrée.');await loadAll()}
-async function addClass(){const n=$('newClassName').value.trim(),c=$('newClassCode').value.trim();if(!n||!c)return alert('Indiquez le nom et le code de la classe.');const password=prompt('Mot de passe Direction requis pour créer une classe :');if(password===null)return;const r=await sb.rpc('admin_create_class',{p_name:n,p_code:c,p_password:password});if(r.error)return alert(r.error.message);$('newClassName').value='';$('newClassCode').value='';alert('Classe créée avec succès.');await loadAll()}
-async function addSubject(){const n=$('newSubject').value.trim();if(!n)return;const r=await sb.from('subjects').insert({name:n}).select().single();if(r.error)return alert(r.error.message);$('newSubject').value='';await loadAll()}
-async function deleteClass(id){if(!confirm('Supprimer cette classe ? Les élèves et affectations liées peuvent empêcher la suppression.'))return;const r=await sb.from('classes').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
-async function deleteSubject(id){if(!confirm('Supprimer cette matière ?'))return;const r=await sb.from('subjects').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
-function editAssignment(id){const a=assignments.find(x=>x.id===id);if(!a)return;openModal(`<h2>Modifier l'affectation</h2><div class="field"><label>Enseignant</label><select id="editTeacher"></select></div><div class="field"><label>Classe</label><select id="editClass"></select></div><div class="field"><label>Matière</label><select id="editSubject"></select></div><div class="field"><label>Titulaire de la classe ?</label><select id="editHome"><option value="false">Non</option><option value="true">Oui</option></select></div><button class="btn lime" onclick="saveAssignmentEdit('${id}')">ENREGISTRER LES MODIFICATIONS</button>`);fill('editTeacher',teachers.map(x=>[x.id,x.full_name]));fill('editClass',classes.map(x=>[x.id,x.name]));fill('editSubject',subjects.map(x=>[x.id,x.name]));$('editTeacher').value=a.teacher_id;$('editClass').value=a.class_id;$('editSubject').value=a.subject_id;$('editHome').value=String(!!a.is_homeroom)}
-async function saveAssignmentEdit(id){const r=await sb.rpc('admin_update_teacher_assignment',{p_assignment_id:id,p_teacher_id:$('editTeacher').value,p_class_id:$('editClass').value,p_subject_id:$('editSubject').value,p_is_homeroom:$('editHome').value==='true'});if(r.error)return alert(r.error.message);closeModal();await loadAll()}
-async function deleteAssignment(id){if(!confirm('Retirer cette affectation ?'))return;const r=await sb.from('teacher_assignments').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
-async function deleteNote(id){if(!confirm('Supprimer cette note ?'))return;const r=await sb.from('notes').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}async function deleteSelectedNews(){
-  const ids=[...document.querySelectorAll('.news-select:checked')].map(x=>x.value).filter(Boolean);
-  if(!ids.length)return alert('Sélectionnez au moins un message à supprimer.');
-  const selected=news.filter(n=>ids.includes(n.id));
-  const summary=selected.slice(0,3).map(n=>n.title).join(', ')+(selected.length>3?'…':'');
-  if(!confirm(`Supprimer ${ids.length} communiqué${ids.length>1?'s':''} ?\n\nCes messages disparaîtront immédiatement des espaces Parents/Enseignants.`))return;
-  const r=await sb.rpc('admin_delete_announcements',{p_announcement_ids:ids});
-  if(r.error)return alert('Suppression impossible : '+r.error.message);
-  alert(`${ids.length} communiqué${ids.length>1?'s':''} supprimé${ids.length>1?'s':''}.`);
+
+/* ---------- chargement ---------- */
+async function loadAll(){
+  try{
+    const [cl,sub,par,tea,can,stu,lnk,asg,nts,ann,fr,cf,tm]=await Promise.all([
+      sb.from('classes').select('*').order('sort_order'),
+      sb.from('subjects').select('*').order('name'),
+      fetchAll(()=>sb.from('parents').select('id,full_name,phone,parent_type,registered_level,created_at').order('full_name').order('id')),
+      fetchAll(()=>sb.from('teachers').select('id,full_name,phone,registered_level,created_at').order('full_name').order('id')),
+      sb.from('canteen_staff').select('id,full_name,phone,created_at').order('full_name'),
+      fetchAll(()=>sb.from('students').select('id,full_name,class_id,classes(id,name,level)').order('full_name').order('id')),
+      fetchAll(()=>sb.from('student_parents').select('student_id,parent_id,relationship').order('student_id').order('parent_id')),
+      sb.from('teacher_assignments').select('id,teacher_id,class_id,subject_id,is_homeroom,teachers(id,full_name),classes(id,name,level),subjects(id,name)').order('created_at'),
+      sb.from('notes').select('id,student_id,teacher_assignment_id,term,note_type,value,title,created_at,students(full_name,class_id,classes(name,level)),teacher_assignments(subjects(name),teachers(full_name))').order('created_at',{ascending:false}).limit(1000),
+      sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(500),
+      fetchAll(()=>sb.rpc('admin_fee_report')),
+      sb.from('class_fees').select('class_id,total_amount'),
+      sb.from('canteen_menus').select('id,menu_date,dish_name,created_by_name,canteen_photos(id)').eq('menu_date',todayStr()).maybeSingle()
+    ]);
+    for(const r of [cl,sub,can,asg,nts,ann,cf]) if(r.error) throw r.error;
+    classes=cl.data||[];subjects=sub.data||[];parents=par;teachers=tea;canteenStaff=can.data||[];students=stu;links=lnk;
+    assignments=asg.data||[];notes=nts.data||[];news=ann.data||[];feeReport=fr;classFees=cf.data||[];todayMenu=tm&&!tm.error?tm.data:null;
+    await loadAccessCodes();
+    renderAll();
+  }catch(e){alert('Chargement impossible : '+(e?.message||e))}
+}
+function renderAll(){
+  applyTheme();
+  fill('assignTeacher',teachers.slice().sort(byName).map(t=>[t.id,t.full_name+(t.registered_level!==LEVEL?' ('+levelName(t.registered_level)+')':'')]));
+  fill('assignClass',lc().map(x=>[x.id,x.name]));
+  fill('assignSubject',subjects.map(x=>[x.id,x.name]));
+  fill('noteClassFilter',lc().map(x=>[x.id,x.name]),'Toutes les classes du niveau');
+  fillNewsTargets();
+  renderDashboard();renderParents();renderClassDirectory();renderStudentSearch();renderTeachers();renderSchool();renderAssignments();renderNotes();renderNews();
+  renderFees();renderCanteenStaff();renderDashCanteen();
+  if(!$('childRows').children.length)resetChildRows();else refreshChildClassOptions();
+  if(!$('codesPanel').classList.contains('hidden'))renderAccessCodeGroup(window.currentCodeGroup||'parent');
+}
+
+/* ---------- tableau de bord ---------- */
+function renderDashboard(){
+  const rows=feeReport.filter(r=>r.level===LEVEL);
+  $('kStudents').textContent=ls().length;$('kStudentsSub').textContent='Élèves du '+levelName(LEVEL);
+  $('kParents').textContent=lp().length;$('kTeachers').textContent=lt().length;
+  const expected=rows.reduce((a,r)=>a+Number(r.total_due||0),0),paid=rows.reduce((a,r)=>a+Number(r.paid||0),0);
+  $('kFees').textContent=money(paid);$('kFeesSub').textContent='sur '+money(expected)+' attendus';
+  $('classStats').innerHTML=lc().map(c=>{const n=students.filter(s=>s.class_id===c.id).length;return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #ECECF7"><span>${esc(c.name)}</span><b>${n}</b></div>`}).join('')||'<div class="empty">Aucune classe</div>';
+  $('recentNews').innerHTML=news.slice(0,5).map(n=>`<div style="padding:9px 0;border-bottom:1px solid #ECECF7"><div class="row" style="justify-content:space-between"><b>${esc(n.title)}</b>${pill(n.importance)}</div><div class="hint">${esc(targetLabel(n))} · ${fmtDT(n.created_at)}</div></div>`).join('')||'<div class="empty">Aucun message</div>';
+}
+function renderDashCanteen(){
+  const e=$('dashCanteen');if(!e)return;
+  if(!todayMenu)e.innerHTML='<div class="hint">Aucun menu saisi pour le moment aujourd’hui.</div>';
+  else{const n=(todayMenu.canteen_photos||[]).length;e.innerHTML=`<b>${esc(todayMenu.dish_name)}</b> <span class="pill ${n>=2?'green':'orange'}">${n}/2 photo${n>1?'s':''}</span><div class="hint">Saisi par ${esc(todayMenu.created_by_name||'la cantine')}</div>`}
+}
+
+/* ---------- parents & élèves ---------- */
+function childRowHtml(){return `<div class="childrow"><div class="field"><label>Nom complet de l'enfant</label><input class="cname" placeholder="Nom et prénoms"></div><div class="field"><label>Classe</label><select class="cclass">${lc().map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div><button class="btn red small" onclick="this.closest('.childrow').remove()" title="Retirer cet enfant">✕</button></div>`}
+function resetChildRows(){$('childRows').innerHTML=childRowHtml()}
+function addChildRow(){$('childRows').insertAdjacentHTML('beforeend',childRowHtml())}
+function refreshChildClassOptions(){document.querySelectorAll('#childRows .cclass').forEach(sel=>{const keep=sel.value;sel.innerHTML=lc().map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');if([...sel.options].some(o=>o.value===keep))sel.value=keep})}
+async function createFamily(){
+  const name=$('pName').value.trim(),phone=$('pPhone').value.trim(),type=$('pType').value;
+  const kids=[...document.querySelectorAll('#childRows .childrow')].map(r=>({name:r.querySelector('.cname').value.trim(),class_id:r.querySelector('.cclass').value})).filter(k=>k.name);
+  if(!name)return notice('parentMsg','Le nom du parent est obligatoire.',false);
+  if(!kids.length)return notice('parentMsg','Ajoutez au moins un enfant : on enregistre toujours un parent avec ses enfants.',false);
+  if(kids.some(k=>!k.class_id))return notice('parentMsg','Choisissez la classe de chaque enfant.',false);
+  notice('parentMsg','Enregistrement en cours…',true);
+  const r=await sb.rpc('admin_create_parent_with_children',{p_full_name:name,p_phone:phone||null,p_parent_type:type,p_level:LEVEL,p_children:kids});
+  if(r.error)return notice('parentMsg',r.error.message,false);
+  const code=r.data?.parent_code||'—';
+  $('parentMsg').innerHTML='';
+  const box=$('parentCreated');box.classList.remove('hidden');
+  box.innerHTML=`<b>${esc(type)} « ${esc(name)} » enregistré(e) avec ${kids.length} enfant${kids.length>1?'s':''}.</b><br>Code d'accès à remettre au parent :<br><span class="code bigcode">${esc(code)}</span><div class="hint">${kids.map(k=>esc(k.name)+' ('+esc(className(k.class_id))+')').join(' · ')}</div>`;
+  $('pName').value='';$('pPhone').value='';resetChildRows();
   await loadAll();
 }
-function toggleAllNews(checked){document.querySelectorAll('.news-select').forEach(x=>x.checked=checked);syncNewsSelection()}
-function syncNewsSelection(){
-  const boxes=[...document.querySelectorAll('.news-select')], checked=boxes.filter(x=>x.checked);
-  const all=$('newsSelectAll');
-  if(all){all.checked=boxes.length>0&&checked.length===boxes.length;all.indeterminate=checked.length>0&&checked.length<boxes.length}
+function renderClassDirectory(){
+  $('classDirectory').innerHTML=lc().map(c=>{const count=students.filter(s=>s.class_id===c.id).length;return `<div class="card" style="cursor:pointer;padding:14px" onclick="viewClassStudents('${c.id}')"><div class="row" style="justify-content:space-between"><b style="font-size:19px;color:var(--navy)">${esc(c.name)}</b><span class="pill navy">${count} élève${count>1?'s':''}</span></div><div class="hint" style="margin-top:8px">Voir la liste →</div></div>`}).join('')||'<div class="empty">Aucune classe.</div>'
 }
-function changeNewsTarget(){const t=$('newsTarget').value;const f=$('newsTargetField');if(t==='all_parents'||t==='all_teachers'||t==='canteen'){f.innerHTML='';return}if(t==='class_parents'){const allowed=activeCycle==='primary'?['CI1','CI2','CP1','CP2','CE1','CE2','CM1','CM2']:['6ième','5ième','4ième','3ième'];f.innerHTML='<div class="field"><label>Classe</label><select id="newsTargetSelect"></select></div>';fill('newsTargetSelect',classes.filter(x=>allowed.includes(x.name)).map(x=>[x.id,x.name]));return}if(t==='teacher'){f.innerHTML='<div class="field"><label>Enseignant</label><select id="newsTargetSelect"></select></div>';fill('newsTargetSelect',teachers.map(x=>[x.id,x.full_name]));return}if(t==='student'){f.innerHTML='<div class="field"><label>Élève</label><select id="newsTargetSelect"></select></div>';fill('newsTargetSelect',students.map(x=>[x.id,`${x.full_name} — ${classes.find(c=>c.id===x.class_id)?.name||''}`]));}}
-async function publishNews(){const t=$('newsTarget').value;if(t==='all_parents'){const allowed=activeCycle==='primary'?['CI1','CI2','CP1','CP2','CE1','CE2','CM1','CM2']:['6ième','5ième','4ième','3ième'];const cycleClasses=classes.filter(c=>allowed.includes(c.name));if(!cycleClasses.length)return notice('newsMsg','Aucune classe dans ce cycle. Vérifiez les classes enregistrées.',false);for(const c of cycleClasses){const rr=await sb.rpc('admin_create_announcement',{p_title:$('newsTitle').value.trim(),p_body:$('newsBodyText').value.trim(),p_importance:$('newsImportance').value,p_target_type:'class_parents',p_class_id:c.id,p_student_id:null,p_parent_id:null,p_teacher_id:null});if(rr.error)return notice('newsMsg',`Erreur pour ${c.name} : ${rr.error.message}`,false);}notice('newsMsg',`Message envoyé aux parents du cycle ${activeCycle==='primary'?'primaire':'collège'}.`);$('newsTitle').value='';$('newsBodyText').value='';await loadAll();return;}if(t==='canteen'){const cr=await sb.rpc('admin_send_canteen_message',{p_title:$('newsTitle').value.trim(),p_body:$('newsBodyText').value.trim(),p_importance:$('newsImportance').value});if(cr.error)return notice('newsMsg',cr.error.message,false);notice('newsMsg','Message envoyé au personnel de cantine.');$('newsTitle').value='';$('newsBodyText').value='';return;}if((t==='class_parents'||t==='teacher'||t==='student')&&!$('newsTargetSelect')?.value)return notice('newsMsg',t==='class_parents'?'Sélectionnez une classe.':t==='student'?'Sélectionnez un élève.':'Sélectionnez un enseignant.',false);let v={p_class_id:null,p_student_id:null,p_parent_id:null,p_teacher_id:null};if(t==='class_parents')v.p_class_id=$('newsTargetSelect').value;if(t==='teacher')v.p_teacher_id=$('newsTargetSelect').value;if(t==='student')v.p_student_id=$('newsTargetSelect').value;const r=await sb.rpc('admin_create_announcement',{p_title:$('newsTitle').value.trim(),p_body:$('newsBodyText').value.trim(),p_importance:$('newsImportance').value,p_target_type:t,...v});if(r.error)return notice('newsMsg',r.error.message,false);notice('newsMsg','Message envoyé.');$('newsTitle').value='';$('newsBodyText').value='';await loadAll()}
-async function deleteConversation(id){if(!confirm('Supprimer définitivement toute cette conversation et ses messages ?'))return;const r=await sb.rpc('admin_delete_conversation',{p_conversation_id:id});if(r.error)return alert(r.error.message);await loadMessages()}
-async function loadMessages(){const r=await sb.from('conversations').select('id,parent_id,teacher_id,student_id,created_at,parents(full_name),teachers(full_name),students(full_name),messages(id,sender_role,body,created_at)').order('created_at',{ascending:false});if(r.error){$('messagesBody').innerHTML=`<tr><td colspan="6" class="empty">${esc(r.error.message)}</td></tr>`;return}conversations=r.data||[];$('messagesBody').innerHTML=conversations.map(c=>{const ms=(c.messages||[]).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));const last=ms[ms.length-1];return `<tr><td>${esc(c.students?.full_name||'')}</td><td>${esc(c.parents?.full_name||'')}</td><td>${esc(c.teachers?.full_name||'')}</td><td>${ms.length}</td><td>${esc(last?.body||'')}</td><td>${last?new Date(last.created_at).toLocaleString('fr-FR'):new Date(c.created_at).toLocaleString('fr-FR')}</td><td><button class="btn red small" onclick="deleteConversation('${c.id}')">Supprimer</button></td></tr>`}).join('')||'<tr><td colspan="7" class="empty">Aucune conversation.</td></tr>'}
-function viewClassStudents(classId){const c=classes.find(x=>x.id===classId);const list=students.filter(s=>s.class_id===classId).sort((a,b)=>a.full_name.localeCompare(b.full_name,'fr',{sensitivity:'base'}));openModal(`<h2>${esc(c?.name||'Classe')}</h2><p class="muted">${list.length} élève${list.length>1?'s':''} · ordre alphabétique</p>${list.map((s,i)=>`<div style="padding:11px 0;border-bottom:1px solid #F2F5F9"><b>${i+1}. ${esc(s.full_name)}</b></div>`).join('')||'<p class="muted">Aucun élève dans cette classe.</p>'}`)}
-function linkStudentModal(studentId){const s=students.find(x=>x.id===studentId);openModal(`<h2>Associer un parent</h2><p class="muted">Élève : <b>${esc(s?.full_name||'')}</b></p><div class="field"><label>Parent</label><select id="linkParentSelect"></select></div><div id="linkParentMsg"></div><button class="btn" onclick="saveStudentParentLink('${studentId}')">ENREGISTRER LE LIEN</button>`);fill('linkParentSelect',parents.map(x=>[x.id,x.full_name]))}
-async function saveStudentParentLink(studentId){const pid=$('linkParentSelect').value;if(!pid)return notice('linkParentMsg','Sélectionnez un parent.',false);const r=await sb.rpc('admin_link_student_to_parent',{p_student_id:studentId,p_parent_id:pid,p_relationship:$('childRelationship')?.value||'Père'});if(r.error)return notice('linkParentMsg',r.error.message,false);await loadAll();closeModal();viewStudent(studentId)}
+function viewClassStudents(classId){
+  const c=classes.find(x=>x.id===classId);
+  const list=students.filter(s=>s.class_id===classId).sort(byName);
+  openModal(`<h2>${esc(c?.name||'Classe')}</h2><p class="muted">${list.length} élève${list.length>1?'s':''} · ordre alphabétique · cliquez pour ouvrir la fiche</p>${list.map((s,i)=>`<div style="padding:10px 0;border-bottom:1px solid #ECECF7;cursor:pointer" onclick="viewStudent('${s.id}')"><b>${i+1}. ${esc(s.full_name)}</b> <span class="hint">· ${parentsOf(s.id).map(p=>esc(p.parent_type)+' '+esc(p.full_name)).join(', ')||'—'}</span></div>`).join('')||'<p class="muted">Aucun élève dans cette classe.</p>'}`)
+}
+function renderStudentSearch(){
+  const term=$('studentSearch')?.value||'';const box=$('studentSearchResults');if(!box)return;
+  if(!term.trim()){box.innerHTML='';return}
+  const res=searchStudents(term,ls());
+  box.innerHTML=`<div class="results">${res.map(s=>`<div class="res" onclick="viewStudent('${s.id}')"><div><b>${esc(s.full_name)}</b><div class="hint">${esc(s.classes?.name||'')} · ${parentsOf(s.id).map(p=>esc(p.parent_type)+' '+esc(p.full_name)).join(', ')||'Aucun parent'}</div></div><span class="pill navy">Ouvrir / message</span></div>`).join('')||'<div class="empty">Aucun élève trouvé dans ce niveau.</div>'}</div>`
+}
+function renderParents(){
+  const t=norm($('parentSearch')?.value||'');
+  const rows=lp().filter(p=>norm(`${p.full_name} ${p.phone||''} ${p.parent_type} ${kidsOf(p.id).map(k=>k.full_name).join(' ')}`).includes(t)).sort(byName).map(p=>{
+    const kids=kidsOf(p.id);
+    return `<tr><td><b>${esc(p.full_name)}</b></td><td><span class="pill pink">${esc(p.parent_type)}</span></td><td>${esc(p.phone||'—')}</td><td>${kids.map(k=>`<a href="#" onclick="viewStudent('${k.id}');return false" style="color:var(--navy);font-weight:700">${esc(k.full_name)}</a> <span class="pill navy">${esc(k.classes?.name||'')}</span>`).join('<br>')||'<span class="hint">Aucun enfant</span>'}</td><td><div class="actions"><button class="btn small" onclick="addChildModal('${p.id}')">+ Enfant</button><button class="btn ghost small" onclick="editParentModal('${p.id}')">Modifier</button><button class="btn ghost small" onclick="resetParent('${p.id}')">Nouveau code</button><button class="btn red small" onclick="deleteParent('${p.id}')">Supprimer</button></div></td></tr>`}).join('');
+  $('parentsBody').innerHTML=rows||'<tr><td colspan="5" class="empty">Aucun parent trouvé.</td></tr>'
+}
+function addChildModal(parentId){
+  const p=parents.find(x=>x.id===parentId);
+  openModal(`<h2>Ajouter un enfant</h2><p class="muted">${esc(p?.parent_type||'')} : <b>${esc(p?.full_name||'')}</b>${p?.phone?' · '+esc(p.phone):''}</p><div class="field"><label>Nom complet de l'élève</label><input id="modalChildName"></div><div class="field"><label>Classe</label><select id="modalChildClass">${classOptions(lc()[0]?.id)}</select></div><div id="modalChildMsg"></div><button class="btn accent" onclick="saveChildModal('${parentId}')">AJOUTER L'ENFANT</button><p class="hint" style="margin-top:12px">L'enfant est automatiquement rattaché à ce parent. Vous pouvez en ajouter d'autres à la suite.</p>`)
+}
+async function saveChildModal(parentId){
+  const name=$('modalChildName').value.trim(),cid=$('modalChildClass').value;
+  if(!name||!cid)return notice('modalChildMsg','Nom de l’élève et classe obligatoires.',false);
+  const r=await sb.rpc('admin_add_child_to_parent',{p_parent_id:parentId,p_student_full_name:name,p_class_id:cid});
+  if(r.error)return notice('modalChildMsg',r.error.message,false);
+  notice('modalChildMsg','Enfant ajouté et rattaché au parent.');$('modalChildName').value='';await loadAll()
+}
+function editParentModal(id){
+  const p=parents.find(x=>x.id===id);if(!p)return;
+  openModal(`<h2>Modifier le parent</h2><div class="field"><label>Type de parent</label><select id="epType">${['Père','Mère','Tante','Oncle','Tuteur'].map(t=>`<option${t===p.parent_type?' selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label>Nom complet</label><input id="epName" value="${esc(p.full_name)}"></div><div class="field"><label>Téléphone</label><input id="epPhone" value="${esc(p.phone||'')}"></div><div id="epMsg"></div><button class="btn accent" onclick="saveParentEdit('${id}')">ENREGISTRER</button>`)
+}
+async function saveParentEdit(id){
+  const r=await sb.rpc('admin_update_parent',{p_parent_id:id,p_full_name:$('epName').value.trim(),p_phone:$('epPhone').value.trim()||null,p_parent_type:$('epType').value});
+  if(r.error)return notice('epMsg',r.error.message,false);
+  closeModal();await loadAll()
+}
+async function resetParent(id){if(!confirm('Générer un nouveau code pour ce parent ? L’ancien code ne fonctionnera plus.'))return;const r=await sb.rpc('admin_reset_parent_code',{p_parent_id:id});if(r.error)return alert(r.error.message);alert('Nouveau code parent : '+r.data.parent_code);await loadAccessCodes()}
+async function deleteParent(id){
+  const p=parents.find(x=>x.id===id),kids=kidsOf(id);
+  if(!confirm(`Supprimer ${p?.full_name||'ce parent'} ?\n\nLes enfants qui n'ont aucun autre parent seront aussi supprimés (${kids.map(k=>k.full_name).join(', ')||'aucun'}), avec leurs notes et paiements.`))return;
+  const r=await sb.rpc('admin_delete_parent',{p_parent_id:id});if(r.error)return alert(r.error.message);await loadAll()
+}
+function viewStudent(id){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  const ps=parentsOf(id);
+  openModal(`<h2>${esc(s.full_name)}</h2><p class="muted">Classe : <b>${esc(s.classes?.name||'')}</b> · ${levelName(s.classes?.level)}</p>
+  <h3>Parent(s)</h3>${ps.map(p=>`<p style="margin:6px 0"><span class="pill pink">${esc(p.parent_type)}</span> <b>${esc(p.full_name)}</b><br><span class="hint">${esc(p.phone||'Pas de téléphone')}</span></p>`).join('')||'<p class="muted">Aucun parent lié.</p>'}
+  <div class="card" style="margin-top:14px;background:var(--tint);box-shadow:none"><h3>✉ Envoyer un message au parent de ${esc(s.full_name)}</h3>
+  <div class="field"><label>Titre</label><input id="smTitle"></div><div class="field"><label>Importance</label><select id="smImp"><option value="pas_urgent">Pas urgent</option><option value="urgent">Urgent</option></select></div><div class="field"><label>Message</label><textarea id="smBody" style="min-height:90px"></textarea></div><button class="btn accent" onclick="sendStudentMessage('${id}')">ENVOYER AU PARENT</button><div id="smMsg"></div></div>
+  <div class="card" style="margin-top:14px;box-shadow:none"><h3>Modifier l'élève</h3><div class="formgrid"><div class="field"><label>Nom complet</label><input id="seName" value="${esc(s.full_name)}"></div><div class="field"><label>Classe</label><select id="seClass">${classOptions(s.class_id)}</select></div></div><div class="actions"><button class="btn small" onclick="saveStudentEdit('${id}')">Enregistrer</button><button class="btn red small" onclick="deleteStudent('${id}')">Supprimer l'élève</button></div><div id="seMsg"></div></div>`)
+}
+async function sendStudentMessage(id){
+  const title=$('smTitle').value.trim(),body=$('smBody').value.trim();
+  if(!title||!body)return notice('smMsg','Titre et message obligatoires.',false);
+  const r=await sb.rpc('admin_create_announcement',{p_title:title,p_body:body,p_importance:$('smImp').value,p_target_type:'student',p_student_id:id});
+  if(r.error)return notice('smMsg',r.error.message,false);
+  notice('smMsg','Message envoyé au parent.');$('smTitle').value='';$('smBody').value='';
+  const a=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(500);news=a.data||news;renderNews();renderDashboard()
+}
+async function saveStudentEdit(id){
+  const name=$('seName').value.trim(),cid=$('seClass').value;if(!name)return notice('seMsg','Nom obligatoire.',false);
+  const r=await sb.from('students').update({full_name:name,class_id:cid,updated_at:new Date().toISOString()}).eq('id',id);
+  if(r.error)return notice('seMsg',r.error.message,false);
+  closeModal();await loadAll()
+}
+async function deleteStudent(id){
+  const s=students.find(x=>x.id===id);
+  if(!confirm(`Supprimer l'élève ${s?.full_name||''} ? Ses notes et paiements seront supprimés.`))return;
+  const r=await sb.from('students').delete().eq('id',id);if(r.error)return alert(r.error.message);closeModal();await loadAll()
+}
 
-async function loadAccessCodes(refreshPanel=false){const r=await sb.rpc('admin_access_codes');if(r.error){window.accessCodes=[];if(!refreshPanel && !$('codesPanel').classList.contains('hidden')) $('codesBody').innerHTML=`<tr><td colspan="5" class="empty">${esc(r.error.message)}</td></tr>`;return}window.accessCodes=r.data||[];if(!$('codesPanel').classList.contains('hidden')) renderAccessCodeGroup(window.currentCodeGroup||'parent')}
-function showAccessCodeGroup(role){window.currentCodeGroup=role;const panel=$('codesPanel');panel.classList.remove('hidden');if(!window.accessCodes||!window.accessCodes.length){loadAccessCodes(true);return}renderAccessCodeGroup(role)}
-function renderAccessCodeGroup(role){const rows=(window.accessCodes||[]).filter(x=>x.role===role).sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'fr',{sensitivity:'base'}));$('codesPanelTitle').textContent=role==='parent'?'Codes Parent':'Codes Enseignants';$('codesPanelHint').textContent=`${rows.length} compte${rows.length>1?'s':''} · ordre alphabétique`;$('codesBody').innerHTML=rows.map(x=>`<tr><td><b>${esc(x.full_name||'')}</b></td><td>${esc(x.phone||'—')}</td><td><span class="code">${esc(x.access_code||'—')}</span></td><td>${x.generated_at?new Date(x.generated_at).toLocaleString('fr-FR'):'—'}</td><td>${x.is_current?'<span class="pill green">Actuel</span>':'<span class="pill gray">Historique</span>'}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Aucun code enregistré pour ce type.</td></tr>'}
-function exportAccessCodesPdf(){const role=window.currentCodeGroup||'parent';const rows=(window.accessCodes||[]).filter(x=>x.role===role).sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'fr',{sensitivity:'base'}));if(!rows.length)return alert('Aucun code à exporter pour ce type.');if(!window.jspdf?.jsPDF)return printCodesFallback(rows);const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});const title=role==='parent'?'Codes Parent':'Codes Enseignants';doc.setFontSize(16);doc.text(`CONNECT TEST — ${title}`,14,15);doc.setFontSize(9);doc.text('Liste administrative confidentielle',14,21);let y=29;const cols=[14,82,145,190,245];const headers=['Nom','Téléphone','Code','Généré le','Statut'];doc.setFont(undefined,'bold');headers.forEach((h,i)=>doc.text(h,cols[i],y));doc.setFont(undefined,'normal');y+=6;rows.forEach(x=>{if(y>190){doc.addPage();y=15;doc.setFont(undefined,'bold');headers.forEach((h,i)=>doc.text(h,cols[i],y));doc.setFont(undefined,'normal');y+=6}const vals=[x.full_name||'',x.phone||'—',x.access_code||'—',x.generated_at?new Date(x.generated_at).toLocaleString('fr-FR'):'—',x.is_current?'Actuel':'Historique'];vals.forEach((v,i)=>doc.text(String(v).slice(0,30),cols[i],y));y+=5});doc.save(`CONNECT TEST-${role==='parent'?'codes-parents':'codes-enseignants'}.pdf`)}
-function printCodesFallback(rows){const title=window.currentCodeGroup==='teacher'?'Codes Enseignants':'Codes Parent';const w=window.open('','_blank');if(!w)return;w.document.write(`<html><head><title>CONNECT TEST — ${title}</title><style>body{font-family:Arial;padding:25px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:7px;text-align:left}h1{color:#123B66}</style>
-<style>html[data-cycle="primary"] .side{background:linear-gradient(180deg,#071A8C,#02085C)}html[data-cycle="primary"] .nav button.active{background:linear-gradient(90deg,#FFE84A,#F7B7D5);color:#071A8C}html[data-cycle="college"] .side{background:linear-gradient(180deg,#071A8C,#02085C)}html[data-cycle="college"] .nav button.active{background:#FFE84A;color:#071A8C}</style>
-</head><body><h1>CONNECT TEST — ${title}</h1><table><tr><th>Nom</th><th>Téléphone</th><th>Code</th><th>Généré le</th><th>Statut</th></tr>${rows.map(x=>`<tr><td>${esc(x.full_name||'')}</td><td>${esc(x.phone||'—')}</td><td>${esc(x.access_code||'—')}</td><td>${x.generated_at?new Date(x.generated_at).toLocaleString('fr-FR'):'—'}</td><td>${x.is_current?'Actuel':'Historique'}</td></tr>`).join('')}</table><script>window.print()<\/script></body></html>`);w.document.close()}
-function viewStudent(id){const s=students.find(x=>x.id===id),ps=studentsParents(id);openModal(`<h2>${esc(s?.full_name)}</h2><p class="muted">Classe : ${esc(s?.classes?.name||'')}</p><h3>Parent(s)</h3>${ps.map(p=>`<p><b>${esc(p.full_name)}</b><br>${esc(p.phone||'')}</p>`).join('')||'<p class="muted">Aucun parent lié.</p>'}`);}
-function viewParent(id){const p=parents.find(x=>x.id===id),kids=(window.parentLinks||[]).filter(x=>x.parent_id===id).map(x=>students.find(s=>s.id===x.student_id)).filter(Boolean);openModal(`<h2>${esc(p?.full_name)}</h2><p>${esc(p?.phone||'')}</p><h3>Enfant(s)</h3>${kids.map(k=>`<p>${esc(k.full_name)} — ${esc(k.classes?.name||'')}</p>`).join('')||'<p class="muted">Aucun enfant lié.</p>'}`);}
-function openModal(html){$('modalContent').innerHTML=html;$('modal').classList.remove('hidden')}function closeModal(){$('modal').classList.add('hidden')}
-(async()=>{await ensureParentLinks();const s=await sb.auth.getSession();if(s.data.session)await start();})();
+/* ---------- enseignants, classes, matières ---------- */
+function renderTeachers(){
+  const t=norm($('teacherSearch')?.value||'');
+  $('teachersBody').innerHTML=lt().filter(x=>norm(`${x.full_name} ${x.phone||''}`).includes(t)).sort(byName).map(x=>{
+    const a=assignments.filter(y=>y.teacher_id===x.id);
+    return `<tr><td><b>${esc(x.full_name)}</b></td><td>${esc(x.phone||'—')}</td><td>${a.map(y=>`${esc(y.classes?.name||'')} — ${esc(y.subjects?.name||'')}${y.is_homeroom?' <span class="pill green">Titulaire</span>':''}`).join('<br>')||'Aucune affectation'}</td><td><div class="actions"><button class="btn small" onclick="resetTeacher('${x.id}')">Nouveau code</button><button class="btn red small" onclick="deleteTeacher('${x.id}')">Supprimer</button></div></td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Aucun enseignant dans ce niveau.</td></tr>'
+}
+async function createTeacher(){
+  const n=$('teacherName').value.trim(),p=$('teacherPhone').value.trim();if(!n)return notice('teacherMsg','Nom obligatoire.',false);
+  const r=await sb.rpc('admin_create_teacher',{p_full_name:n,p_phone:p||null,p_level:LEVEL});if(r.error)return notice('teacherMsg',r.error.message,false);
+  notice('teacherMsg',`Enseignant créé. CODE À REMETTRE : ${r.data.teacher_code}`);$('teacherName').value='';$('teacherPhone').value='';await loadAll()
+}
+async function resetTeacher(id){if(!confirm('Générer un nouveau code pour cet enseignant ?'))return;const r=await sb.rpc('admin_reset_teacher_code',{p_teacher_id:id});if(r.error)return alert(r.error.message);alert('Nouveau code enseignant : '+r.data.teacher_code);await loadAccessCodes()}
+async function deleteTeacher(id){const t=teachers.find(x=>x.id===id);if(!confirm(`Supprimer l'enseignant ${t?.full_name||''} ? Ses affectations, notes et conversations seront supprimées.`))return;const r=await sb.from('teachers').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
+async function assignTeacher(){
+  if(!$('assignTeacher').value||!$('assignClass').value||!$('assignSubject').value)return notice('assignMsg','Choisissez enseignant, classe et matière.',false);
+  const r=await sb.rpc('admin_assign_teacher',{p_teacher_id:$('assignTeacher').value,p_class_id:$('assignClass').value,p_subject_id:$('assignSubject').value,p_is_homeroom:$('assignHome').value==='true'});
+  if(r.error)return notice('assignMsg',r.error.message,false);notice('assignMsg','Affectation enregistrée.');await loadAll()
+}
+function renderSchool(){
+  $('classesList').innerHTML=lc().map(c=>{const n=students.filter(s=>s.class_id===c.id).length;return `<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid #ECECF7"><span><b>${esc(c.name)}</b></span><span class="pill navy">${n} élève${n>1?'s':''}</span></div>`}).join('');
+  $('subjectsList').innerHTML=subjects.map(s=>`<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid #ECECF7"><b>${esc(s.name)}</b><button class="btn red small" onclick="deleteSubject('${s.id}')">Supprimer</button></div>`).join('')||'<div class="empty">Aucune matière</div>'
+}
+async function addSubject(){const n=$('newSubject').value.trim();if(!n)return;const r=await sb.from('subjects').insert({name:n}).select().single();if(r.error)return alert(r.error.message);$('newSubject').value='';await loadAll()}
+async function deleteSubject(id){if(!confirm('Supprimer cette matière ?'))return;const r=await sb.from('subjects').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
+function renderAssignments(){
+  const ids=lcIds();
+  $('assignmentsBody').innerHTML=assignments.filter(a=>ids.has(a.class_id)).map(a=>`<tr><td>${esc(a.teachers?.full_name||'')}</td><td>${esc(a.classes?.name||'')}</td><td>${esc(a.subjects?.name||'')}</td><td>${a.is_homeroom?'<span class="pill green">Oui</span>':'Non'}</td><td><div class="actions"><button class="btn small" onclick="editAssignment('${a.id}')">Modifier</button><button class="btn red small" onclick="deleteAssignment('${a.id}')">Retirer</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Aucune affectation dans ce niveau.</td></tr>'
+}
+function editAssignment(id){
+  const a=assignments.find(x=>x.id===id);if(!a)return;
+  openModal(`<h2>Modifier l'affectation</h2><div class="field"><label>Enseignant</label><select id="editTeacher"></select></div><div class="field"><label>Classe</label><select id="editClass">${classOptions(a.class_id)}</select></div><div class="field"><label>Matière</label><select id="editSubject"></select></div><div class="field"><label>Titulaire de la classe ?</label><select id="editHome"><option value="false">Non</option><option value="true">Oui</option></select></div><button class="btn accent" onclick="saveAssignmentEdit('${id}')">ENREGISTRER LES MODIFICATIONS</button>`);
+  fill('editTeacher',teachers.slice().sort(byName).map(x=>[x.id,x.full_name]));fill('editSubject',subjects.map(x=>[x.id,x.name]));
+  $('editTeacher').value=a.teacher_id;$('editSubject').value=a.subject_id;$('editHome').value=String(!!a.is_homeroom)
+}
+async function saveAssignmentEdit(id){const r=await sb.rpc('admin_update_teacher_assignment',{p_assignment_id:id,p_teacher_id:$('editTeacher').value,p_class_id:$('editClass').value,p_subject_id:$('editSubject').value,p_is_homeroom:$('editHome').value==='true'});if(r.error)return alert(r.error.message);closeModal();await loadAll()}
+async function deleteAssignment(id){if(!confirm('Retirer cette affectation ?'))return;const r=await sb.from('teacher_assignments').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
 
-function switchCycle(cycle){activeCycle=cycle;document.documentElement.dataset.cycle=cycle;const allowed=cycle==='primary'?['CI1','CI2','CP1','CP2','CE1','CE2','CM1','CM2']:['6ième','5ième','4ième','3ième'];const visible=classes.filter(c=>allowed.includes(c.name));fill('childStudentClass',visible.map(c=>[c.id,c.name]));fill('assignClass',visible.map(c=>[c.id,c.name]));changeNewsTarget();fill('feeClass',classes.map(x=>[x.id,x.name]));}
-async function deleteCanteenMessage(id){if(!confirm('Supprimer ce message de la Direction ?'))return;const r=await sb.from('canteen_announcements').delete().eq('id',id);if(r.error)return alert(r.error.message);loadCanteen()}
-async function createCanteenStaff(){const n=$('canteenStaffName').value.trim(),p=$('canteenStaffPhone').value.trim();if(!n)return notice('canteenStaffMsg','Nom obligatoire.',false);const r=await sb.rpc('admin_create_canteen_staff',{p_full_name:n,p_phone:p||null});if(r.error)return notice('canteenStaffMsg',r.error.message,false);notice('canteenStaffMsg',`Accès créé. CODE À REMETTRE : ${r.data.staff_code}`);$('canteenStaffName').value='';$('canteenStaffPhone').value='';loadCanteen();}
-async function loadCanteen(){const cm=await sb.from('canteen_announcements').select('*').order('created_at',{ascending:false});$('canteenMessages').innerHTML=(cm.data||[]).map(x=>`<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)"><div><b>${esc(x.title)}</b><div class="hint">${esc(x.body)} · ${new Date(x.created_at).toLocaleString('fr-FR')}</div></div><button class="btn red small" onclick="deleteCanteenMessage('${x.id}')">Supprimer</button></div>`).join('')||'<div class="hint">Aucun message envoyé.</div>';const r=await sb.from('canteen_staff').select('id,full_name,phone,created_at').order('full_name');canteenStaff=r.data||[];$('canteenStaffList').innerHTML=canteenStaff.map(x=>`<div style="padding:8px;border-bottom:1px solid var(--line)"><b>${esc(x.full_name)}</b> · ${esc(x.phone||'—')}</div>`).join('')||'Aucun personnel enregistré';const m=await sb.rpc('canteen_daily_menu',{p_code:null});$('canteenMeals').innerHTML=(m.data||[]).map(x=>`<div style="padding:12px;border-bottom:1px solid var(--line)"><b>${esc(x.meal_date)} — ${esc(x.menu_name)}</b><div class="hint">Publié par ${esc(x.created_by_name||'Cantine')}</div><div class="row">${x.photo1_url?`<img src="${esc(x.photo1_url)}" style="width:180px;max-height:140px;object-fit:cover;border-radius:12px">`:''}${x.photo2_url?`<img src="${esc(x.photo2_url)}" style="width:180px;max-height:140px;object-fit:cover;border-radius:12px">`:''}</div></div>`).join('')||'<p class="hint">Aucun menu publié.</p>'}
-async function saveClassFee(){const r=await sb.rpc('admin_set_class_fee',{p_class_id:$('feeClass').value,p_total:Number($('feeTotal').value)});if(r.error)return notice('feeClassMsg',r.error.message,false);notice('feeClassMsg','Montant des frais enregistré.');loadFeeReport()}
-async function recordFeePayment(){const name=$('feeStudentSearch').value.trim(),s=students.find(x=>x.full_name.toLowerCase()===name.toLowerCase());if(!s)return notice('feePaymentMsg','Sélectionnez un élève de la liste.',false);const r=await sb.rpc('admin_record_fee_payment',{p_student_id:s.id,p_installment_no:Number($('feeInstallment').value),p_amount:Number($('feeAmount').value),p_note:null});if(r.error)return notice('feePaymentMsg',r.error.message,false);notice('feePaymentMsg','Paiement enregistré.');$('feeAmount').value='';loadFeeReport()}
-async function loadFeeReport(){const [f,p]=await Promise.all([sb.from('school_fees').select('class_id,total_amount'),sb.from('school_fee_payments').select('student_id,installment_no,amount,paid_at')]);if(f.error||p.error){$('feeReportBody').innerHTML=`<tr><td colspan="6">${esc(f.error?.message||p.error?.message)}</td></tr>`;return}feeRows=students.map(s=>{const cls=classes.find(c=>c.id===s.class_id);const due=Number(f.data.find(x=>x.class_id===s.class_id)?.total_amount||0);const pays=p.data.filter(x=>x.student_id===s.id);const paid=pays.reduce((a,x)=>a+Number(x.amount),0);return {id:s.id,name:s.full_name,className:cls?.name||'',classId:s.class_id,due,paid,remaining:Math.max(0,due-paid),rate:due?Math.min(100,paid/due*100):0,pays}});renderFeeReport()}
-function renderFeeReport(){const cid=$('feeReportClass')?.value||'',threshold=Number($('feeThreshold')?.value||0);const rows=feeRows.filter(x=>(!cid||x.classId===cid)&&(!threshold||x.paid<threshold)).sort((a,b)=>a.className.localeCompare(b.className)||a.name.localeCompare(b.name));$('feeReportBody').innerHTML=rows.map(x=>`<tr><td><b>${esc(x.name)}</b><div class="hint">${x.pays.length} tranche(s) enregistrée(s)</div></td><td>${esc(x.className)}</td><td>${x.due.toLocaleString('fr-FR')}</td><td>${x.paid.toLocaleString('fr-FR')}</td><td><b>${x.remaining.toLocaleString('fr-FR')}</b></td><td>${x.rate.toFixed(1)}%</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Aucun élève ne correspond au filtre.</td></tr>'}
-function filterFeeStudents(){const v=$('feeStudentSearch').value;const s=students.find(x=>x.full_name===v);if(s){const c=classes.find(x=>x.id===s.class_id);$('feeReportClass').value=s.class_id;renderFeeReport()}}
+/* ---------- notes ---------- */
+function renderNotes(){
+  const ids=lcIds(),cf=$('noteClassFilter')?.value||'',tf=$('noteTermFilter')?.value||'';
+  const arr=notes.filter(n=>ids.has(n.students?.class_id)&&(!cf||n.students?.class_id===cf)&&(!tf||n.term===tf));
+  $('notesBody').innerHTML=arr.map(n=>`<tr><td>${esc(n.students?.full_name||'')}</td><td>${esc(n.students?.classes?.name||'')}</td><td>${esc(n.teacher_assignments?.subjects?.name||'')}</td><td>${esc(n.term)}</td><td>${esc(n.note_type)}</td><td><b>${esc(n.value)}/20</b></td><td>${fmtDT(n.created_at)}</td><td><button class="btn red small" onclick="deleteNote('${n.id}')">Supprimer</button></td></tr>`).join('')||'<tr><td colspan="8" class="empty">Aucune note.</td></tr>'
+}
+async function deleteNote(id){if(!confirm('Supprimer cette note ?'))return;const r=await sb.from('notes').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
+
+/* ---------- envoyer un message (communiqués) ---------- */
+function fillNewsTargets(){
+  const e=$('newsTarget');if(!e)return;const keep=e.value;const lab=LEVEL==='primaire'?'du Primaire':'du Collège';
+  e.innerHTML=[['level_parents',`Tous les parents ${lab}`],['class_parents',`Les parents d'une classe (${levelName(LEVEL)})`],['student','Un parent précis (rechercher l’élève)'],['all_parents','Tous les parents de l’école (Primaire + Collège)'],['all_teachers','Tous les enseignants'],['teacher','Un enseignant'],['all_canteen','Toute la cantine (un seul clic)']].map(x=>`<option value="${x[0]}">${esc(x[1])}</option>`).join('');
+  if(keep&&[...e.options].some(o=>o.value===keep))e.value=keep;
+  changeNewsTarget();
+}
+function changeNewsTarget(){
+  const t=$('newsTarget').value,f=$('newsTargetField');
+  if(t==='class_parents'){f.innerHTML='<div class="field"><label>Classe</label><select id="newsTargetSelect"></select></div>';fill('newsTargetSelect',lc().map(x=>[x.id,x.name]));return}
+  if(t==='teacher'){f.innerHTML='<div class="field"><label>Enseignant</label><select id="newsTargetSelect"></select></div>';fill('newsTargetSelect',lt().sort(byName).map(x=>[x.id,x.full_name]));return}
+  if(t==='student'){f.innerHTML=`<div class="field"><label>Rechercher l'élève (le message ira à son parent)</label><input id="newsStudentSearch" oninput="renderNewsStudentResults()" autocomplete="off" placeholder="Nom de l'élève…"></div><div id="newsStudentResults"></div><div id="newsStudentPicked" class="hint"></div>`;newsStudentId=null;return}
+  f.innerHTML=''
+}
+function renderNewsStudentResults(){
+  const term=$('newsStudentSearch').value,box=$('newsStudentResults');
+  if(!term.trim()){box.innerHTML='';return}
+  const res=searchStudents(term,ls());
+  box.innerHTML=`<div class="results">${res.map(s=>`<div class="res${s.id===newsStudentId?' sel':''}" onclick="pickNewsStudent('${s.id}')"><div><b>${esc(s.full_name)}</b><div class="hint">${esc(s.classes?.name||'')} · ${parentsOf(s.id).map(p=>esc(p.parent_type)+' '+esc(p.full_name)).join(', ')||'Aucun parent'}</div></div></div>`).join('')||'<div class="empty">Aucun élève trouvé.</div>'}</div>`
+}
+function pickNewsStudent(id){
+  newsStudentId=id;const s=students.find(x=>x.id===id);
+  $('newsStudentPicked').innerHTML=`✔ Destinataire : parent de <b>${esc(s?.full_name||'')}</b> (${esc(s?.classes?.name||'')}) — ${parentsOf(id).map(p=>esc(p.parent_type)+' '+esc(p.full_name)).join(', ')}`;
+  renderNewsStudentResults()
+}
+function targetLabel(n){
+  switch(n.target_type){
+    case 'level_parents':return 'Parents '+(n.level==='primaire'?'du Primaire':'du Collège');
+    case 'all_parents':return 'Tous les parents de l’école';
+    case 'class_parents':return 'Parents de '+(className(n.class_id)||'la classe');
+    case 'student':return 'Parent de '+(students.find(s=>s.id===n.student_id)?.full_name||'l’élève');
+    case 'all_teachers':return 'Tous les enseignants';
+    case 'teacher':return 'Enseignant : '+(teachers.find(t=>t.id===n.teacher_id)?.full_name||'enseignant');
+    case 'all_canteen':return 'Toute la cantine';
+    default:return n.target_type
+  }
+}
+function renderNews(){
+  $('newsHistory').innerHTML=news.map(n=>`<tr><td><input class="news-select" type="checkbox" value="${n.id}" onchange="syncNewsSelection()" aria-label="Sélectionner ${esc(n.title)}"></td><td>${fmtDT(n.created_at)}</td><td><b>${esc(n.title)}</b><div class="hint">${esc(String(n.body||'').slice(0,90))}</div></td><td>${pill(n.importance)}</td><td>${esc(targetLabel(n))}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Aucun message.</td></tr>';
+  syncNewsSelection()
+}
+async function publishNews(){
+  const t=$('newsTarget').value,title=$('newsTitle').value.trim(),body=$('newsBodyText').value.trim();
+  if(!title||!body)return notice('newsMsg','Le titre et le message sont obligatoires.',false);
+  const v={p_level:null,p_class_id:null,p_student_id:null,p_teacher_id:null};
+  if(t==='level_parents')v.p_level=LEVEL;
+  if(t==='class_parents'){v.p_class_id=$('newsTargetSelect')?.value||null;if(!v.p_class_id)return notice('newsMsg','Sélectionnez une classe.',false)}
+  if(t==='teacher'){v.p_teacher_id=$('newsTargetSelect')?.value||null;if(!v.p_teacher_id)return notice('newsMsg','Sélectionnez un enseignant.',false)}
+  if(t==='student'){v.p_student_id=newsStudentId;if(!v.p_student_id)return notice('newsMsg','Recherchez puis cliquez sur l’élève dont le parent doit recevoir le message.',false)}
+  const r=await sb.rpc('admin_create_announcement',{p_title:title,p_body:body,p_importance:$('newsImportance').value,p_target_type:t,...v});
+  if(r.error)return notice('newsMsg',r.error.message,false);
+  notice('newsMsg','Message envoyé.');$('newsTitle').value='';$('newsBodyText').value='';
+  const a=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(500);news=a.data||news;renderNews();renderDashboard()
+}
+async function deleteSelectedNews(){
+  const ids=[...document.querySelectorAll('.news-select:checked')].map(x=>x.value).filter(Boolean);
+  if(!ids.length)return alert('Sélectionnez au moins un message à supprimer.');
+  if(!confirm(`Supprimer ${ids.length} message${ids.length>1?'s':''} ?\n\nIls disparaîtront immédiatement des espaces concernés.`))return;
+  const r=await sb.rpc('admin_delete_announcements',{p_announcement_ids:ids});
+  if(r.error)return alert('Suppression impossible : '+r.error.message);
+  await loadAll()
+}
+function toggleAllNews(checked){document.querySelectorAll('.news-select').forEach(x=>x.checked=checked);syncNewsSelection()}
+function syncNewsSelection(){const boxes=[...document.querySelectorAll('.news-select')],checked=boxes.filter(x=>x.checked),all=$('newsSelectAll');if(all){all.checked=boxes.length>0&&checked.length===boxes.length;all.indeterminate=checked.length>0&&checked.length<boxes.length}}
+
+/* ---------- messagerie Parent <-> Enseignant (lecture + suppression) ---------- */
+async function loadMessages(){
+  const r=await sb.from('conversations').select('id,parent_id,teacher_id,student_id,created_at,parents(full_name),teachers(full_name),students(full_name,classes(name,level)),messages(id,sender_role,body,created_at)').order('created_at',{ascending:false});
+  if(r.error){$('messagesBody').innerHTML=`<tr><td colspan="8" class="empty">${esc(r.error.message)}</td></tr>`;return}
+  conversations=r.data||[];renderMessagesList()
+}
+const convMsgs=c=>(c.messages||[]).slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+function renderMessagesList(){
+  const lv=$('msgLevelFilter')?.value||'';
+  const list=conversations.filter(c=>!lv||c.students?.classes?.level===lv);
+  $('messagesBody').innerHTML=list.map(c=>{const ms=convMsgs(c),last=ms[ms.length-1];return `<tr><td>${esc(c.students?.full_name||'')}</td><td>${esc(c.students?.classes?.name||'')}</td><td>${esc(c.parents?.full_name||'')}</td><td>${esc(c.teachers?.full_name||'')}</td><td class="num">${ms.length}</td><td>${esc(String(last?.body||'').slice(0,80))}</td><td>${last?fmtDT(last.created_at):fmtDT(c.created_at)}</td><td><div class="actions"><button class="btn small" onclick="openConversation('${c.id}')">Lire</button><button class="btn red small" onclick="deleteConversation('${c.id}')">Supprimer</button></div></td></tr>`}).join('')||'<tr><td colspan="8" class="empty">Aucune conversation.</td></tr>'
+}
+function openConversation(id){
+  const c=conversations.find(x=>x.id===id);if(!c)return;
+  const ms=convMsgs(c);
+  openModal(`<h2>Conversation — ${esc(c.students?.full_name||'')}</h2><p class="muted">Parent : <b>${esc(c.parents?.full_name||'')}</b> · Enseignant : <b>${esc(c.teachers?.full_name||'')}</b> · ${esc(c.students?.classes?.name||'')}</p>${ms.map(m=>`<div class="msgline ${m.sender_role}"><div><b>${m.sender_role==='parent'?'Parent':'Enseignant'}</b> <span class="hint">${fmtDT(m.created_at)}</span><div>${esc(m.body)}</div></div><button class="btn red small" onclick="deleteMessage('${c.id}','${m.id}')">Supprimer</button></div>`).join('')||'<p class="muted">Aucun message dans cette conversation.</p>'}<div style="margin-top:14px"><button class="btn red small" onclick="deleteConversation('${c.id}')">Supprimer toute la conversation</button></div>`,true)
+}
+async function deleteMessage(convId,msgId){
+  if(!confirm('Supprimer ce message ?'))return;
+  const r=await sb.from('messages').delete().eq('id',msgId);if(r.error)return alert(r.error.message);
+  const c=conversations.find(x=>x.id===convId);if(c)c.messages=(c.messages||[]).filter(m=>m.id!==msgId);
+  renderMessagesList();openConversation(convId)
+}
+async function deleteConversation(id){
+  if(!confirm('Supprimer toute la conversation et tous ses messages ?'))return;
+  const r=await sb.from('conversations').delete().eq('id',id);if(r.error)return alert(r.error.message);
+  conversations=conversations.filter(c=>c.id!==id);closeModal();renderMessagesList()
+}
+
+/* ---------- fenêtre modale ---------- */
+function openModal(html,wide=false){$('modalContent').innerHTML=html;$('modalCard').classList.toggle('wide',!!wide);$('modal').classList.remove('hidden')}
+function closeModal(){$('modal').classList.add('hidden')}
+
+/* ================= FRAIS DE SCOLARITÉ ================= */
+let feeOpenStudent=null,feePayments=[];
+const feeRows=()=>feeReport.filter(r=>r.level===LEVEL);
+const pctOf=r=>Number(r.total_due)>0?Math.min(100,Math.round(Number(r.paid)/Number(r.total_due)*100)):0;
+function feeStatus(r){if(!r.fee_defined)return 'nodef';if(Number(r.paid)<=0)return 'none';if(Number(r.remaining)<=0)return 'done';return 'partial'}
+const STATUS_LABEL={done:'Soldé',partial:'Partiel',none:'Aucun paiement',nodef:'Frais non définis'};
+const STATUS_CLS={done:'green',partial:'orange',none:'red',nodef:'gray'};
+const statusPill=r=>{const s=feeStatus(r);return `<span class="pill ${STATUS_CLS[s]}">${STATUS_LABEL[s]}</span>`};
+const barHtml=p=>`<div class="bar ${p>=100?'':p>=50?'warn':'low'}" title="${p}%"><i style="width:${p}%"></i></div><div class="hint">${p}%</div>`;
+
+function renderFees(){
+  fill('fClass',lc().map(c=>[c.id,c.name]),'Toutes les classes du niveau');
+  renderFeeKpis();renderFeeChips();renderFeeSearch();renderFeeReport();renderFeeClassSummary();
+  if(feeOpenStudent)renderFeeFile();
+}
+function renderFeeKpis(){
+  const rows=feeRows(),exp=rows.reduce((a,r)=>a+Number(r.total_due),0),paid=rows.reduce((a,r)=>a+Number(r.paid),0),rem=rows.reduce((a,r)=>a+Number(r.remaining),0);
+  const rate=exp>0?Math.round(paid/exp*100):0;
+  $('feeKpis').innerHTML=`<div class="kpi"><div class="l">Total attendu</div><b>${money(exp)}</b></div><div class="kpi"><div class="l">Total encaissé</div><b>${money(paid)}</b></div><div class="kpi"><div class="l">Reste à encaisser</div><b>${money(rem)}</b></div><div class="kpi"><div class="l">Taux de recouvrement</div><b>${rate}%</b></div>`
+}
+function renderFeeChips(){
+  const st=$('fStatus')?.value||'';
+  const chips=[['','Tous'],['none','Aucun paiement'],['unsettled','Non soldés'],['partial','Partiels'],['done','Soldés']];
+  $('feeChips').innerHTML=chips.map(c=>`<button class="chip${st===c[0]?' on':''}" onclick="$('fStatus').value='${c[0]}';renderFeeReport();renderFeeChips()">${c[1]}</button>`).join('')+`<button class="chip" onclick="resetFeeFilters();$('fPaidLt').value='15000';renderFeeReport()">Payé &lt; 15 000 FCFA</button>`
+}
+function resetFeeFilters(){['fClass','fStatus','fSearch','fPaidLt','fPaidGt','fRemGt','fRemLt'].forEach(i=>{if($(i))$(i).value=''});if($('fSort'))$('fSort').value='name';renderFeeReport();renderFeeChips()}
+function reportRows(){
+  const cls=$('fClass')?.value||'',st=$('fStatus')?.value||'',q=norm($('fSearch')?.value||'');
+  const paidLt=numVal('fPaidLt'),paidGt=numVal('fPaidGt'),remGt=numVal('fRemGt'),remLt=numVal('fRemLt');
+  let rows=feeRows().filter(r=>{
+    if(cls&&r.class_id!==cls)return false;
+    const s=feeStatus(r);
+    if(st==='unsettled'&&!(s==='partial'||s==='none'))return false;
+    if(st&&st!=='unsettled'&&s!==st)return false;
+    if(q&&!norm(`${r.student_name} ${r.parent_names||''}`).includes(q))return false;
+    if(paidLt!==null&&!(Number(r.paid)<paidLt))return false;
+    if(paidGt!==null&&!(Number(r.paid)>paidGt))return false;
+    if(remGt!==null&&!(Number(r.remaining)>remGt))return false;
+    if(remLt!==null&&!(Number(r.remaining)<remLt))return false;
+    return true});
+  const nm=(a,b)=>a.student_name.localeCompare(b.student_name,'fr',{sensitivity:'base'});
+  const lastKey=r=>r.last_payment||'';
+  const sorters={name:nm,class:(a,b)=>a.sort_order-b.sort_order||nm(a,b),paid_asc:(a,b)=>Number(a.paid)-Number(b.paid)||nm(a,b),paid_desc:(a,b)=>Number(b.paid)-Number(a.paid)||nm(a,b),rem_desc:(a,b)=>Number(b.remaining)-Number(a.remaining)||nm(a,b),rem_asc:(a,b)=>Number(a.remaining)-Number(b.remaining)||nm(a,b),pct_asc:(a,b)=>pctOf(a)-pctOf(b)||nm(a,b),pct_desc:(a,b)=>pctOf(b)-pctOf(a)||nm(a,b),last_desc:(a,b)=>lastKey(b).localeCompare(lastKey(a))||nm(a,b),last_asc:(a,b)=>lastKey(a).localeCompare(lastKey(b))||nm(a,b),inst_desc:(a,b)=>b.installments-a.installments||nm(a,b)};
+  return rows.sort(sorters[$('fSort')?.value||'name']||nm)
+}
+function renderFeeReport(){
+  const rows=reportRows();
+  $('feeCount').textContent=`${rows.length} élève${rows.length>1?'s':''} sur ${feeRows().length}`;
+  $('feeReportBody').innerHTML=rows.map((r,i)=>`<tr style="cursor:pointer" onclick="openFeeFile('${r.student_id}')"><td>${i+1}</td><td><b>${esc(r.student_name)}</b></td><td>${esc(r.class_name)}</td><td class="num">${r.fee_defined?fmtN(r.total_due):'—'}</td><td class="num"><b>${fmtN(r.paid)}</b></td><td class="num">${r.fee_defined?fmtN(r.remaining):'—'}</td><td style="min-width:110px">${barHtml(pctOf(r))}</td><td class="num">${r.installments}</td><td>${fmtDate(r.last_payment)}</td><td><div>${esc(r.parent_names||'—')}</div><div class="hint">${esc(r.parent_phones||'')}</div></td><td>${statusPill(r)}</td></tr>`).join('')||'<tr><td colspan="11" class="empty">Aucun élève ne correspond à ces critères.</td></tr>';
+  const t=rows.reduce((a,r)=>({d:a.d+Number(r.total_due),p:a.p+Number(r.paid),r:a.r+Number(r.remaining)}),{d:0,p:0,r:0});
+  $('feeReportFoot').innerHTML=rows.length?`<tr><td colspan="3">TOTAUX (${rows.length})</td><td class="num">${fmtN(t.d)}</td><td class="num">${fmtN(t.p)}</td><td class="num">${fmtN(t.r)}</td><td colspan="5"></td></tr>`:''
+}
+function renderFeeClassSummary(){
+  const rows=feeRows();let T={n:0,d:0,p:0,r:0,a:0,b:0,c:0};
+  $('feeClassBody').innerHTML=lc().map(c=>{
+    const rs=rows.filter(r=>r.class_id===c.id),n=rs.length,fee=Number(classFees.find(f=>f.class_id===c.id)?.total_amount||0);
+    const d=rs.reduce((a,r)=>a+Number(r.total_due),0),p=rs.reduce((a,r)=>a+Number(r.paid),0),rem=rs.reduce((a,r)=>a+Number(r.remaining),0);
+    const done=rs.filter(r=>feeStatus(r)==='done').length,part=rs.filter(r=>feeStatus(r)==='partial').length,none=rs.filter(r=>feeStatus(r)==='none').length;
+    T.n+=n;T.d+=d;T.p+=p;T.r+=rem;T.a+=done;T.b+=part;T.c+=none;
+    const pc=d>0?Math.min(100,Math.round(p/d*100)):0;
+    return `<tr><td><b>${esc(c.name)}</b></td><td class="num">${n}</td><td class="num">${fee>0?fmtN(fee):'<span class="pill gray">non défini</span>'}</td><td class="num">${fmtN(d)}</td><td class="num">${fmtN(p)}</td><td class="num">${fmtN(rem)}</td><td style="min-width:110px">${barHtml(pc)}</td><td class="num">${done}</td><td class="num">${part}</td><td class="num">${none}</td></tr>`}).join('');
+  const pc=T.d>0?Math.round(T.p/T.d*100):0;
+  $('feeClassFoot').innerHTML=`<tr><td>TOTAL</td><td class="num">${T.n}</td><td></td><td class="num">${fmtN(T.d)}</td><td class="num">${fmtN(T.p)}</td><td class="num">${fmtN(T.r)}</td><td>${pc}%</td><td class="num">${T.a}</td><td class="num">${T.b}</td><td class="num">${T.c}</td></tr>`
+}
+function renderFeeSearch(){
+  const term=$('feeSearch')?.value||'',box=$('feeSearchResults');if(!box)return;
+  if(!term.trim()){box.innerHTML='';return}
+  const rows=feeRows();
+  const ids=new Set(searchStudents(term,rows.map(r=>({id:r.student_id,full_name:r.student_name}))).map(s=>s.id));
+  const res=[...ids].map(id=>rows.find(r=>r.student_id===id)).filter(Boolean);
+  const order=searchStudents(term,res.map(r=>({id:r.student_id,full_name:r.student_name}))).map(s=>s.id);
+  res.sort((a,b)=>order.indexOf(a.student_id)-order.indexOf(b.student_id));
+  box.innerHTML=`<div class="results">${res.map(r=>`<div class="res${r.student_id===feeOpenStudent?' sel':''}" onclick="openFeeFile('${r.student_id}')"><div><b>${esc(r.student_name)}</b><div class="hint">${esc(r.class_name)} · payé ${money(r.paid)}${r.fee_defined?' sur '+money(r.total_due):''}</div></div>${statusPill(r)}</div>`).join('')||'<div class="empty">Aucun élève trouvé dans ce niveau.</div>'}</div>`
+}
+async function openFeeFile(studentId){
+  feeOpenStudent=studentId;
+  const r=await sb.from('fee_payments').select('*').eq('student_id',studentId).order('installment_no');
+  if(r.error)return alert(r.error.message);
+  feePayments=r.data||[];renderFeeSearch();renderFeeFile();
+  $('feeFile').scrollIntoView({behavior:'smooth',block:'nearest'})
+}
+function renderFeeFile(){
+  const row=feeReport.find(x=>x.student_id===feeOpenStudent);if(!row){$('feeFile').innerHTML='';return}
+  const paid=feePayments.reduce((a,p)=>a+Number(p.amount),0),total=Number(row.total_due),rem=Math.max(total-paid,0);
+  const used=new Set(feePayments.map(p=>p.installment_no));let next=null;for(let i=1;i<=15;i++){if(!used.has(i)){next=i;break}}
+  $('feeFile').innerHTML=`<div class="card" style="margin-top:14px;background:var(--tint);box-shadow:none">
+  <div class="toolbar"><div><h3 style="margin:0">${esc(row.student_name)} <span class="pill navy">${esc(row.class_name)}</span></h3><div class="hint">${esc(row.parent_names||'')} ${esc(row.parent_phones?'· '+row.parent_phones:'')}</div></div><button class="btn ghost small" onclick="feeOpenStudent=null;$('feeFile').innerHTML='';renderFeeSearch()">Fermer</button></div>
+  <div class="kpis"><div class="kpi"><div class="l">Total à payer (classe)</div><b>${row.fee_defined?money(total):'Non défini'}</b></div><div class="kpi"><div class="l">Déjà payé</div><b>${money(paid)}</b></div><div class="kpi"><div class="l">Reste à payer</div><b>${row.fee_defined?money(rem):'—'}</b></div><div class="kpi"><div class="l">Tranches saisies</div><b>${feePayments.length} / 15</b></div></div>
+  ${row.fee_defined?'':'<div class="notice danger">Le montant total de cette classe n\'est pas encore défini. Utilisez « Définir le montant total par classe ».</div>'}
+  <div class="table-wrap" style="margin-bottom:12px"><table class="table" style="min-width:520px"><thead><tr><th>Tranche</th><th class="num">Montant</th><th>Date</th><th>Note</th><th>Actions</th></tr></thead><tbody>${feePayments.map(p=>`<tr><td><b>N° ${p.installment_no}</b></td><td class="num">${money(p.amount)}</td><td>${fmtDate(p.paid_at)}</td><td>${esc(p.note||'')}</td><td><div class="actions"><button class="btn small" onclick="editPayment('${p.id}')">Modifier</button><button class="btn red small" onclick="deletePayment('${p.id}')">Supprimer</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Aucune tranche enregistrée.</td></tr>'}</tbody></table></div>
+  ${next?`<div class="formgrid3"><div class="field"><label>Montant de la tranche N° ${next} (FCFA)</label><input id="payAmount" inputmode="numeric" placeholder="Ex. 25000" onkeydown="if(event.key==='Enter')addPayment()"></div><div class="field"><label>Date du paiement</label><input id="payDate" type="date" value="${todayStr()}"></div><div class="field"><label>Note / n° de reçu (facultatif)</label><input id="payNote"></div></div><button class="btn accent" onclick="addPayment()">ENREGISTRER LA TRANCHE N° ${next}</button>`:'<div class="notice">Les 15 tranches de cet élève sont saisies.</div>'}
+  <div id="payMsg"></div></div>`
+}
+async function refreshFees(){
+  feeReport=await fetchAll(()=>sb.rpc('admin_fee_report'));
+  if(feeOpenStudent){const r=await sb.from('fee_payments').select('*').eq('student_id',feeOpenStudent).order('installment_no');feePayments=r.data||[]}
+  renderDashboard();renderFees()
+}
+async function addPayment(){
+  const amount=numVal('payAmount');
+  if(amount===null||!(amount>0))return notice('payMsg','Saisissez un montant valide.',false);
+  const row=feeReport.find(x=>x.student_id===feeOpenStudent),paid=feePayments.reduce((a,p)=>a+Number(p.amount),0);
+  if(row?.fee_defined&&paid+amount>Number(row.total_due)&&!confirm(`Ce paiement dépasse le total à payer (${money(row.total_due)}). Enregistrer quand même ?`))return;
+  const r=await sb.rpc('admin_add_payment',{p_student_id:feeOpenStudent,p_amount:amount,p_paid_at:$('payDate').value||null,p_note:$('payNote').value.trim()||null});
+  if(r.error)return notice('payMsg',r.error.message,false);
+  await refreshFees();notice('payMsg',`Tranche N° ${r.data.installment_no} enregistrée.`)
+}
+function editPayment(id){
+  const p=feePayments.find(x=>x.id===id);if(!p)return;
+  openModal(`<h2>Modifier la tranche N° ${p.installment_no}</h2><div class="field"><label>Montant (FCFA)</label><input id="epAmount" inputmode="numeric" value="${p.amount}"></div><div class="field"><label>Date</label><input id="epDate" type="date" value="${esc(p.paid_at)}"></div><div class="field"><label>Note</label><input id="epNote" value="${esc(p.note||'')}"></div><div id="epPayMsg"></div><button class="btn accent" onclick="savePaymentEdit('${id}')">ENREGISTRER</button>`)
+}
+async function savePaymentEdit(id){
+  const a=numVal('epAmount');if(a===null||!(a>0))return notice('epPayMsg','Montant invalide.',false);
+  const r=await sb.rpc('admin_update_payment',{p_payment_id:id,p_amount:a,p_paid_at:$('epDate').value||null,p_note:$('epNote').value.trim()||null});
+  if(r.error)return notice('epPayMsg',r.error.message,false);closeModal();await refreshFees()
+}
+async function deletePayment(id){if(!confirm('Supprimer cette tranche ?'))return;const r=await sb.from('fee_payments').delete().eq('id',id);if(r.error)return alert(r.error.message);await refreshFees()}
+function openClassFeesModal(){
+  openModal(`<h2>Montant total des frais de scolarité — ${levelName(LEVEL)}</h2><p class="muted">Montant total à payer par élève, pour chaque classe. Modifiable à tout moment : les parents voient immédiatement le nouveau reste à payer.</p>${lc().map(c=>{const v=Number(classFees.find(f=>f.class_id===c.id)?.total_amount||0);return `<div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid #ECECF7"><b style="min-width:80px">${esc(c.name)}</b><input class="feeInput" data-class="${c.id}" data-old="${v}" inputmode="numeric" value="${v||''}" placeholder="Montant total" style="flex:1;min-width:160px;padding:10px;border:1px solid var(--line);border-radius:10px;text-align:right"><span class="hint">FCFA</span></div>`}).join('')}<div id="cfMsg"></div><div class="row" style="margin-top:14px"><button class="btn accent" onclick="saveClassFees()">ENREGISTRER LES MONTANTS</button></div>`)
+}
+async function saveClassFees(){
+  const inputs=[...document.querySelectorAll('.feeInput')];let n=0;
+  for(const i of inputs){
+    const v=Number(String(i.value||'0').replace(/[\s\u202f\u00a0]/g,'').replace(',','.'));
+    if(isNaN(v)||v<0)return notice('cfMsg','Montant invalide pour une classe.',false);
+    if(v===Number(i.dataset.old))continue;
+    const r=await sb.rpc('admin_set_class_fee',{p_class_id:i.dataset.class,p_amount:v});
+    if(r.error)return notice('cfMsg',r.error.message,false);n++
+  }
+  const cf=await sb.from('class_fees').select('class_id,total_amount');classFees=cf.data||classFees;
+  await refreshFees();closeModal();alert(n?`${n} montant${n>1?'s':''} enregistré${n>1?'s':''}.`:'Aucune modification.')
+}
+function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
+function exportFeesCsv(){
+  const rows=reportRows();if(!rows.length)return alert('Rien à exporter.');
+  const head=['Élève','Classe','Total à payer','Payé','Reste','% payé','Tranches','Dernier paiement','Parent(s)','Téléphone(s)','Statut'];
+  const lines=[head.map(csvCell).join(';')].concat(rows.map(r=>[r.student_name,r.class_name,r.total_due,r.paid,r.remaining,pctOf(r),r.installments,r.last_payment||'',r.parent_names||'',r.parent_phones||'',STATUS_LABEL[feeStatus(r)]].map(csvCell).join(';')));
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`frais-scolarite-${LEVEL}-${todayStr()}.csv`;document.body.appendChild(a);a.click();a.remove()
+}
+function exportFeesPdf(){
+  const rows=reportRows();if(!rows.length)return alert('Rien à exporter.');
+  if(!window.jspdf?.jsPDF)return window.print();
+  const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const cols=[10,18,86,112,142,172,194,234],heads=['#','Élève','Classe','Total','Payé','Reste','Tranches','Parent / Téléphone'];
+  const title=()=>{doc.setFontSize(14);doc.text('Complexe Scolaire SAINT JEAN PAUL II — Frais de scolarité ('+levelName(LEVEL)+')',10,12);doc.setFontSize(8);doc.text('Édité le '+new Date().toLocaleString('fr-FR')+' · '+rows.length+' élève(s)',10,17)};
+  const head=y=>{doc.setFont(undefined,'bold');doc.setFontSize(9);heads.forEach((h,i)=>doc.text(h,cols[i],y));doc.setFont(undefined,'normal')};
+  title();let y=25;head(y);y+=6;
+  rows.forEach((r,i)=>{
+    if(y>192){doc.addPage();title();y=25;head(y);y+=6}
+    const vals=[String(i+1),r.student_name,r.class_name,fmtN(r.total_due),fmtN(r.paid),fmtN(r.remaining),String(r.installments),((r.parent_names||'')+' '+(r.parent_phones||'')).trim()];
+    doc.setFontSize(8);vals.forEach((v,k)=>doc.text(String(v).slice(0,k===1?34:k===7?60:20),cols[k],y));y+=5
+  });
+  const t=rows.reduce((a,r)=>({d:a.d+Number(r.total_due),p:a.p+Number(r.paid),r:a.r+Number(r.remaining)}),{d:0,p:0,r:0});
+  y+=3;doc.setFont(undefined,'bold');doc.text(`TOTAL : attendu ${fmtN(t.d)} FCFA · encaissé ${fmtN(t.p)} FCFA · reste ${fmtN(t.r)} FCFA`,10,y);
+  doc.save(`frais-scolarite-${LEVEL}-${todayStr()}.pdf`)
+}
+
+/* ================= CANTINE (permanente) ================= */
+function renderCanteenStaff(){
+  const codes=accessCodes.filter(x=>x.role==='canteen'&&x.is_current);
+  $('canteenBody').innerHTML=canteenStaff.slice().sort(byName).map(s=>{const c=codes.find(x=>x.canteen_id===s.id);return `<tr><td><b>${esc(s.full_name)}</b></td><td>${esc(s.phone||'—')}</td><td>${c?`<span class="code">${esc(c.access_code)}</span>`:'—'}</td><td><div class="actions"><button class="btn small" onclick="resetCanteen('${s.id}')">Nouveau code</button><button class="btn red small" onclick="deleteCanteen('${s.id}')">Supprimer</button></div></td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Aucune personne enregistrée à la cantine.</td></tr>'
+}
+async function createCanteen(){
+  const n=$('canteenName').value.trim(),p=$('canteenPhone').value.trim();if(!n)return notice('canteenMsg','Nom obligatoire.',false);
+  const r=await sb.rpc('admin_create_canteen_staff',{p_full_name:n,p_phone:p||null});if(r.error)return notice('canteenMsg',r.error.message,false);
+  notice('canteenMsg',`Accès cantine créé. CODE À REMETTRE : ${r.data.canteen_code}`);$('canteenName').value='';$('canteenPhone').value='';await loadAll()
+}
+async function resetCanteen(id){if(!confirm('Générer un nouveau code pour cette personne ?'))return;const r=await sb.rpc('admin_reset_canteen_code',{p_canteen_id:id});if(r.error)return alert(r.error.message);alert('Nouveau code cantine : '+r.data.canteen_code);await loadAccessCodes();renderCanteenStaff()}
+async function deleteCanteen(id){const s=canteenStaff.find(x=>x.id===id);if(!confirm(`Supprimer ${s?.full_name||'cette personne'} de la cantine ?`))return;const r=await sb.from('canteen_staff').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
+async function sendCanteenMessage(){
+  const title=$('canteenMsgTitle').value.trim(),body=$('canteenMsgBody').value.trim();
+  if(!title||!body)return notice('canteenSendMsg','Titre et message obligatoires.',false);
+  const r=await sb.rpc('admin_create_announcement',{p_title:title,p_body:body,p_importance:$('canteenMsgImp').value,p_target_type:'all_canteen'});
+  if(r.error)return notice('canteenSendMsg',r.error.message,false);
+  notice('canteenSendMsg','Message envoyé à toute la cantine.');$('canteenMsgTitle').value='';$('canteenMsgBody').value='';
+  const a=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(500);news=a.data||news;renderNews();renderDashboard()
+}
+function lastSundayCut(){const n=new Date();const d=new Date(Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate()));d.setUTCDate(d.getUTCDate()-d.getUTCDay());return d}
+async function loadCanteen(){
+  const box=$('canteenMenus');box.innerHTML='<div class="empty">Chargement…</div>';
+  const r=await sb.from('canteen_menus').select('id,menu_date,dish_name,description,created_by_name,created_at,canteen_photos(id,slot,image_base64,added_by_name)').order('menu_date',{ascending:false});
+  if(r.error){box.innerHTML=`<div class="notice danger">${esc(r.error.message)}</div>`;return}
+  const cut=lastSundayCut();
+  window.canteenMenusData=(r.data||[]).filter(m=>new Date(m.created_at)>=cut);
+  renderCanteenMenus()
+}
+function renderCanteenMenus(){
+  const list=window.canteenMenusData||[];
+  $('canteenMenus').innerHTML=list.map(m=>{
+    const ph=(m.canteen_photos||[]).slice().sort((a,b)=>a.slot-b.slot);
+    const slots=[1,2].map(s=>{const p=ph.find(x=>x.slot===s);return p?`<img src="data:image/jpeg;base64,${p.image_base64}" alt="Plat" onclick="viewPhoto('${m.id}',${s})">`:'<div class="noph">Photo non ajoutée</div>'}).join('');
+    return `<div class="dishcard"><div class="toolbar" style="margin-bottom:0"><div><b style="font-size:17px;color:var(--navy)">${esc(m.dish_name)}</b> <span class="pill ${ph.length>=2?'green':'orange'}">${ph.length}/2 photos</span><div class="hint">${fmtDate(m.menu_date)} · saisi par ${esc(m.created_by_name||'—')}${m.description?' · '+esc(m.description):''}</div></div><button class="btn red small" onclick="deleteMenu('${m.id}')">Supprimer ce menu</button></div><div class="photos">${slots}</div></div>`}).join('')||'<div class="empty">Aucun menu cette semaine. Les menus s\'effacent chaque dimanche à 00h GMT.</div>'
+}
+function viewPhoto(menuId,slot){
+  const m=(window.canteenMenusData||[]).find(x=>x.id===menuId);const p=m?.canteen_photos?.find(x=>x.slot===slot);if(!p)return;
+  openModal(`<h2>${esc(m.dish_name)}</h2><p class="muted">${fmtDate(m.menu_date)}</p><img src="data:image/jpeg;base64,${p.image_base64}" alt="Plat" style="max-width:100%;border-radius:14px">`,true)
+}
+async function deleteMenu(id){if(!confirm('Supprimer ce menu et ses photos ? La cantine pourra le ressaisir.'))return;const r=await sb.from('canteen_menus').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadCanteen();todayMenu=null;const t=await sb.from('canteen_menus').select('id,menu_date,dish_name,created_by_name,canteen_photos(id)').eq('menu_date',todayStr()).maybeSingle();todayMenu=t.data||null;renderDashCanteen()}
+
+/* ================= CODES D'ACCÈS ================= */
+async function loadAccessCodes(refreshPanel=false){
+  const r=await sb.rpc('admin_access_codes');
+  if(r.error){accessCodes=[];if(refreshPanel&&$('codesBody'))$('codesBody').innerHTML=`<tr><td colspan="5" class="empty">${esc(r.error.message)}</td></tr>`;return}
+  accessCodes=r.data||[];
+  if(!$('codesPanel').classList.contains('hidden'))renderAccessCodeGroup(window.currentCodeGroup||'parent');
+  renderCanteenStaff()
+}
+const CODE_TITLES={parent:'Codes Parents',teacher:'Codes Enseignants',canteen:'Codes Cantine'};
+function showAccessCodeGroup(role){window.currentCodeGroup=role;$('codesPanel').classList.remove('hidden');renderAccessCodeGroup(role)}
+function codeRows(role){return accessCodes.filter(x=>x.role===role).sort((a,b)=>String(a.full_name||'').localeCompare(String(b.full_name||''),'fr',{sensitivity:'base'}))}
+function renderAccessCodeGroup(role){
+  const rows=codeRows(role);
+  $('codesPanelTitle').textContent=CODE_TITLES[role];$('codesPanelHint').textContent=`${rows.length} code${rows.length>1?'s':''} · ordre alphabétique`;
+  $('codesBody').innerHTML=rows.map(x=>`<tr><td><b>${esc(x.full_name||'')}</b></td><td>${esc(x.phone||'—')}</td><td><span class="code">${esc(x.access_code||'—')}</span></td><td>${fmtDT(x.generated_at)}</td><td>${x.is_current?'<span class="pill green">Actuel</span>':'<span class="pill gray">Historique</span>'}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Aucun code enregistré pour ce type.</td></tr>'
+}
+function exportAccessCodesPdf(){
+  const role=window.currentCodeGroup||'parent',rows=codeRows(role);
+  if(!rows.length)return alert('Aucun code à exporter pour ce type.');
+  if(!window.jspdf?.jsPDF)return window.print();
+  const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  doc.setFontSize(16);doc.text(`Complexe Scolaire SAINT JEAN PAUL II — ${CODE_TITLES[role]}`,14,15);doc.setFontSize(9);doc.text('Liste administrative confidentielle',14,21);
+  let y=29;const cols=[14,82,145,190,245],heads=['Nom','Téléphone','Code','Généré le','Statut'];
+  const hd=()=>{doc.setFont(undefined,'bold');heads.forEach((h,i)=>doc.text(h,cols[i],y));doc.setFont(undefined,'normal');y+=6};hd();
+  rows.forEach(x=>{if(y>190){doc.addPage();y=15;hd()}[x.full_name||'',x.phone||'—',x.access_code||'—',fmtDT(x.generated_at),x.is_current?'Actuel':'Historique'].forEach((v,i)=>doc.text(String(v).slice(0,30),cols[i],y));y+=5});
+  doc.save(`SJP2-${role}-codes.pdf`)
+}
+
+/* ================= DÉMARRAGE ================= */
+(async()=>{applyTheme();const s=await sb.auth.getSession();if(s.data.session)await start()})();
 </script>
 </body></html>
-

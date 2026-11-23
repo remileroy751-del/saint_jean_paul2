@@ -4,8 +4,8 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
@@ -13,28 +13,37 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import coil.compose.AsyncImage
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
@@ -50,22 +59,32 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
 
-private val Kaki = Color(0xFF071A8C)
-private val Beurre = Color(0xFFFFF9C9)
+/** Palette du Complexe Scolaire : bleu marine + jaune pâle du logo. Le Primaire ajoute un peu de rose. */
+private object Palette {
+    var level by mutableStateOf("college")
+    val primaire: Boolean get() = level == "primaire"
+}
+
+private val Navy = Color(0xFF040678)
+private val LogoYellow = Color(0xFFFCEE76)
+private val PaleYellow = Color(0xFFFFF9D2)
+private val Pink = Color(0xFFEC5F9E)
+private val PalePink = Color(0xFFFDE7F1)
 private val Black = Color(0xFF111111)
 private val White = Color(0xFFFFFFFF)
 
-// Alias internes conservés pour préserver l'architecture de l'interface.
-private val DarkGreen = Kaki
-private val YellowGreen = Color(0xFFFFE84A)
-private val SoftGreen = Color(0xFFFFFCE0)
-private val Orange = Color(0xFFF4D92E)
-private val Red = Color(0xFFB4234A)
+private val Kaki: Color get() = Navy
+private val Beurre: Color get() = if (Palette.primaire) Color(0xFFFFF1F7) else PaleYellow
+private val DarkGreen: Color get() = Navy
+private val YellowGreen: Color get() = Navy
+private val SoftGreen: Color get() = if (Palette.primaire) PalePink else PaleYellow
+private val Orange: Color get() = LogoYellow
+private val Red = Color(0xFFB3261E)
+private val Accent: Color get() = if (Palette.primaire) Pink else Navy
+private val HeaderBg: Color get() = if (Palette.primaire) PalePink else PaleYellow
 
-data class Child(val id: String, val name: String, val className: String)
-data class ParentFee(val studentId: String, val studentName: String, val className: String, val due: Double, val paid: Double, val remaining: Double)
+data class Child(val id: String, val name: String, val className: String, val level: String)
 data class Teacher(val id: String, val name: String, val subject: String, val homeroom: Boolean)
 data class NoteRow(
     val subject: String,
@@ -81,12 +100,16 @@ data class Announcement(
 data class ChatMessage(val id: String, val senderRole: String, val body: String, val createdAt: String)
 data class TeacherClass(
     val classId: String, val className: String, val subjectId: String,
-    val subjectName: String, val assignmentId: String, val homeroom: Boolean
+    val subjectName: String, val assignmentId: String, val homeroom: Boolean, val level: String
 )
 data class Student(val id: String, val name: String, val className: String)
 data class ClassStat(val classId: String, val className: String, val effectif: Int)
 data class StudentRanking(val id: String, val name: String, val generalAverage: Double?)
 data class TeacherConversation(val parentId: String, val parentName: String, val studentId: String, val studentName: String, val className: String, val lastMessage: String, val lastSenderRole: String, val lastMessageAt: String)
+data class Payment(val no: Int, val amount: Double, val paidAt: String)
+data class FeeInfo(val defined: Boolean, val className: String, val totalDue: Double, val paid: Double, val remaining: Double, val payments: List<Payment>)
+data class MenuDate(val date: String, val dish: String, val photoCount: Int)
+data class CanteenDay(val exists: Boolean, val date: String, val dishName: String, val description: String, val staffName: String, val photos: List<String>, val locked: Boolean)
 data class MobileNotification(val id: String, val title: String, val body: String, val createdAt: String)
 
 class ConnectTestApi {
@@ -123,37 +146,8 @@ class ConnectTestApi {
     fun login(code: String): JSONObject = post("login_with_access_code", JSONObject().put("p_code", code.trim().uppercase()))
         .let { if (it.trimStart().startsWith("[") && JSONArray(it).length() > 0) JSONArray(it).getJSONObject(0) else JSONObject(it) }
 
-    fun saveCanteenMenu(code: String, menu: String, photo1: String, photo2: String) {
-        post("canteen_save_daily_menu", JSONObject().put("p_code", code).put("p_menu_name", menu).put("p_photo1", photo1).put("p_photo2", photo2))
-    }
-
-    fun uploadCanteenPhoto(context: android.content.Context, uri: Uri): String {
-        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: error("Photo illisible")
-        val mime = context.contentResolver.getType(uri) ?: "image/jpeg"
-        val ext = when (mime) { "image/png" -> "png"; "image/webp" -> "webp"; else -> "jpg" }
-        val name = "${UUID.randomUUID()}.$ext"
-        val conn = (URL("$base/storage/v1/object/sjp-canteen/$name").openConnection() as HttpURLConnection)
-        try {
-            conn.requestMethod = "POST"; conn.connectTimeout = 20000; conn.readTimeout = 30000
-            conn.setRequestProperty("apikey", key); conn.setRequestProperty("Authorization", "Bearer $key")
-            conn.setRequestProperty("Content-Type", mime); conn.setRequestProperty("x-upsert", "false"); conn.doOutput = true
-            conn.outputStream.use { it.write(bytes) }
-            val status = conn.responseCode
-            if (status !in 200..299) error(conn.errorStream?.bufferedReader()?.use { it.readText() } ?: "Téléversement photo impossible ($status)")
-        } finally { conn.disconnect() }
-        return "$base/storage/v1/object/public/sjp-canteen/$name"
-    }
-
-    fun canteenMenu(): List<JSONObject> = arr(post("canteen_daily_menu", JSONObject().put("p_code", JSONObject.NULL))).let { a -> (0 until a.length()).map { a.getJSONObject(it) } }
-
-    fun canteenAnnouncements(code: String): List<JSONObject> = arr(post("canteen_announcements_for_staff", JSONObject().put("p_code", code))).let { a -> (0 until a.length()).map { a.getJSONObject(it) } }
-
     fun parentChildren(code: String): List<Child> = arr(post("parent_children", JSONObject().put("p_code", code))).let { a ->
-        (0 until a.length()).map { o -> a.getJSONObject(o).let { Child(it.getString("student_id"), it.getString("student_name"), it.getString("class_name")) } }
-    }
-
-    fun parentFees(code: String): List<ParentFee> = arr(post("parent_fee_summary", JSONObject().put("p_code", code))).let { a ->
-        (0 until a.length()).map { i -> a.getJSONObject(i).let { ParentFee(it.optString("student_id"), it.optString("student_name"), it.optString("class_name"), it.optDouble("total_due"), it.optDouble("total_paid"), it.optDouble("remaining")) } }
+        (0 until a.length()).map { o -> a.getJSONObject(o).let { Child(it.getString("student_id"), it.getString("student_name"), it.getString("class_name"), it.optString("level", "college")) } }
     }
 
     fun teachersForChild(code: String, childId: String): List<Teacher> = arr(post("parent_child_teachers", JSONObject().put("p_code", code).put("p_student_id", childId))).let { a ->
@@ -220,7 +214,7 @@ class ConnectTestApi {
     }
 
     fun teacherClasses(code: String): List<TeacherClass> = arr(post("teacher_classes", JSONObject().put("p_code", code))).let { a ->
-        (0 until a.length()).map { i -> a.getJSONObject(i).let { TeacherClass(it.getString("class_id"), it.getString("class_name"), it.getString("subject_id"), it.getString("subject_name"), it.getString("assignment_id"), it.optBoolean("is_homeroom")) } }
+        (0 until a.length()).map { i -> a.getJSONObject(i).let { TeacherClass(it.getString("class_id"), it.getString("class_name"), it.getString("subject_id"), it.getString("subject_name"), it.getString("assignment_id"), it.optBoolean("is_homeroom"), it.optString("level", "college")) } }
     }
 
     fun mobileNotifications(code: String, role: String, since: String): List<MobileNotification> = arr(post("mobile_notifications", JSONObject().put("p_code", code).put("p_role", role).put("p_since", since))).let { a ->
@@ -237,10 +231,48 @@ class ConnectTestApi {
             .sortedBy { it.name.lowercase(Locale.FRANCE) }
     }
 
+    fun parentFees(code: String, studentId: String): FeeInfo {
+        val o = JSONObject(post("parent_fees", JSONObject().put("p_code", code).put("p_student_id", studentId)))
+        val pa = o.optJSONArray("payments") ?: JSONArray()
+        val list = (0 until pa.length()).map { i -> pa.getJSONObject(i).let { Payment(it.optInt("installment_no"), it.optDouble("amount", 0.0), it.str("paid_at")) } }
+        return FeeInfo(o.optBoolean("defined"), o.str("class_name"), o.optDouble("total_due", 0.0), o.optDouble("paid", 0.0), o.optDouble("remaining", 0.0), list)
+    }
+
+    private fun parseCanteenDay(o: JSONObject): CanteenDay {
+        val pa = o.optJSONArray("photos") ?: JSONArray()
+        val photos = (0 until pa.length()).map { pa.getString(it) }
+        val date = if (o.has("date")) o.str("date") else o.str("menu_date")
+        return CanteenDay(o.optBoolean("exists", false), date, o.str("dish_name"), o.str("description"), o.str("staff_name"), photos, o.optBoolean("locked", photos.size >= 2))
+    }
+
+    fun canteenDates(code: String): List<MenuDate> = arr(post("canteen_menu_dates", JSONObject().put("p_code", code))).let { a ->
+        (0 until a.length()).map { i -> a.getJSONObject(i).let { MenuDate(it.str("menu_date"), it.str("dish_name"), it.optInt("photo_count")) } }
+    }
+
+    fun canteenMenu(code: String, date: String): CanteenDay =
+        parseCanteenDay(JSONObject(post("canteen_menu_for_date", JSONObject().put("p_code", code).put("p_date", date))))
+
+    fun canteenToday(code: String): CanteenDay =
+        parseCanteenDay(JSONObject(post("canteen_today", JSONObject().put("p_code", code))))
+
+    fun canteenSaveMenu(code: String, dish: String, description: String) {
+        post("canteen_save_menu", JSONObject().put("p_code", code).put("p_dish_name", dish).put("p_description", if (description.isBlank()) JSONObject.NULL else description))
+    }
+
+    fun canteenAddPhoto(code: String, imageBase64: String) {
+        post("canteen_add_photo", JSONObject().put("p_code", code).put("p_image", imageBase64))
+    }
+
+    fun canteenAnnouncements(code: String): List<Announcement> = arr(post("canteen_announcements", JSONObject().put("p_code", code))).let { a ->
+        (0 until a.length()).map { i -> a.getJSONObject(i).let { Announcement(it.getString("announcement_id"), it.optString("title"), it.optString("body"), it.optString("importance"), dateLabel(it.optString("created_at")), false) } }
+    }
+
     fun saveNote(code: String, studentId: String, assignmentId: String, term: String, noteType: String, value: Double, title: String?) {
         post("teacher_save_note", JSONObject().put("p_code", code).put("p_student_id", studentId).put("p_assignment_id", assignmentId).put("p_term", term).put("p_note_type", noteType).put("p_value", value).put("p_title", title ?: JSONObject.NULL))
     }
 }
+
+private fun JSONObject.str(key: String): String = if (isNull(key)) "" else optString(key)
 
 private fun JSONObject.takeDouble(key: String): Double? = if (!has(key) || isNull(key)) null else optDouble(key).takeIf { !it.isNaN() }
 
@@ -310,7 +342,7 @@ private fun BackgroundSetupDialogs(activity: MainActivity, prefs: android.conten
         AlertDialog(
             onDismissRequest = { notifDismissed = true },
             title = { Text("Activer les notifications") },
-            text = { Text("Pour être averti(e) dès qu'un message arrive, en haut de l'écran de votre téléphone, autorisez les notifications de CONNECT TEST.") },
+            text = { Text("Pour être averti(e) dès qu'un message arrive, en haut de l'écran de votre téléphone, autorisez les notifications de l'application.") },
             confirmButton = { TextButton(onClick = { notifDismissed = true; openNotificationSettings(activity) }) { Text("Ouvrir les paramètres") } },
             dismissButton = { TextButton(onClick = { notifDismissed = true }) { Text("Plus tard") } }
         )
@@ -318,7 +350,7 @@ private fun BackgroundSetupDialogs(activity: MainActivity, prefs: android.conten
         AlertDialog(
             onDismissRequest = { batteryDone = true; prefs.edit().putBoolean("battery_prompt_done", true).apply() },
             title = { Text("Rester connecté en arrière-plan") },
-            text = { Text("Pour recevoir les messages même quand CONNECT TEST est fermée ou que le téléphone est en veille, autorisez l'application à fonctionner en arrière-plan sans restriction de batterie.") },
+            text = { Text("Pour recevoir les messages même quand l'application est fermée ou que le téléphone est en veille, autorisez l'application à fonctionner en arrière-plan sans restriction de batterie.") },
             confirmButton = { TextButton(onClick = { batteryDone = true; prefs.edit().putBoolean("battery_prompt_done", true).apply(); requestIgnoreBatteryOptimizations(activity) }) { Text("Autoriser") } },
             dismissButton = { TextButton(onClick = { batteryDone = true; prefs.edit().putBoolean("battery_prompt_done", true).apply() }) { Text("Plus tard") } }
         )
@@ -453,27 +485,31 @@ private fun ConnectTestApp(prefs: android.content.SharedPreferences, activity: M
 @Composable
 private fun LoginScreen(code: String, onCode: (String) -> Unit, error: String, loading: Boolean, onLogin: () -> Unit) {
     Column(
-        Modifier.fillMaxSize().padding(horizontal = 28.dp),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 26.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("République Togolaise", color = Navy, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.width(8.dp))
+            TogoFlag(Modifier.size(width = 27.dp, height = 18.dp))
+        }
+        Spacer(Modifier.height(14.dp))
         Image(
-            painterResource(R.drawable.connect_test_logo),
-            contentDescription = "Complexe Scolaire SAINT JEAN PAUL II",
-            modifier = Modifier.size(150.dp),
+            painterResource(R.drawable.sjp2_logo),
+            contentDescription = "Logo Complexe Scolaire SAINT JEAN PAUL II",
+            modifier = Modifier.size(130.dp),
             contentScale = ContentScale.Fit
         )
-        Spacer(Modifier.height(8.dp))
-        Text("🇹🇬 République Togolaise", color = DarkGreen, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-        Text("Complexe Scolaire", color = DarkGreen, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-        Text("SAINT JEAN PAUL II", color = DarkGreen, fontSize = 25.sp, fontWeight = FontWeight.Black)
-        Text("Système de suivi de Scolarité", color = Kaki, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(12.dp))
+        Text("Complexe Scolaire", color = Navy, fontSize = 25.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+        Text("SAINT JEAN PAUL II", color = Navy, fontSize = 31.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center, lineHeight = 36.sp)
+        Spacer(Modifier.height(22.dp))
         OutlinedTextField(
             value = code,
-            onValueChange = { onCode(it.filter(Char::isLetterOrDigit).take(5).uppercase()) },
-            label = { Text("Espace de connexion — Code d’accès") },
-            placeholder = { Text("4 caractères parent / 5 enseignant") },
+            onValueChange = { onCode(it.filter(Char::isLetterOrDigit).take(6).uppercase()) },
+            label = { Text("Code d'accès") },
+            placeholder = { Text("Saisissez votre code") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp)
@@ -481,7 +517,7 @@ private fun LoginScreen(code: String, onCode: (String) -> Unit, error: String, l
         Spacer(Modifier.height(14.dp))
         Button(
             onClick = onLogin,
-            enabled = code.length in 4..5 && !loading,
+            enabled = code.length in 4..6 && !loading,
             modifier = Modifier.fillMaxWidth().height(54.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -491,15 +527,14 @@ private fun LoginScreen(code: String, onCode: (String) -> Unit, error: String, l
             Spacer(Modifier.height(12.dp))
             Text(error, color = Red, fontSize = 13.sp)
         }
-        Spacer(Modifier.height(22.dp))
-        Text(
-            "Contact permanent Enseignant / Parent / Direction.",
-            color = DarkGreen,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        Spacer(Modifier.height(8.dp))
-        Text("Complexe Scolaire SAINT JEAN PAUL II", color = Kaki, fontSize = 15.sp, fontWeight = FontWeight.Black)
+        Spacer(Modifier.height(26.dp))
+        Surface(shape = RoundedCornerShape(18.dp), color = PaleYellow, modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Système de suivi de Scolarité", color = Navy, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(4.dp))
+                Text("Contact permanent Enseignant / Parent / Direction", color = Navy, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+            }
+        }
     }
 }
 
@@ -508,7 +543,7 @@ private fun Header(title: String, subtitle: String, logout: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Beurre),
+        colors = CardDefaults.cardColors(containerColor = HeaderBg),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -516,16 +551,16 @@ private fun Header(title: String, subtitle: String, logout: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painterResource(R.drawable.connect_test_logo),
-                contentDescription = "Logo Complexe Scolaire Saint Jean Paul II",
+                painterResource(R.drawable.sjp2_logo),
+                contentDescription = "Logo Saint Jean Paul II",
                 modifier = Modifier.size(62.dp),
                 contentScale = ContentScale.Fit
             )
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text("SAINT JEAN PAUL II", color = DarkGreen, fontWeight = FontWeight.Black, fontSize = 12.sp)
+                Text("SAINT JEAN PAUL II", color = Accent, fontWeight = FontWeight.Black, fontSize = 12.sp)
                 Text(title, color = DarkGreen, fontWeight = FontWeight.Black, fontSize = 20.sp)
-                Text(if (subtitle.isNotBlank()) subtitle else "CONNECT TEST • Espace sécurisé", color = Kaki, fontSize = 10.sp)
+                Text(if (subtitle.isNotBlank()) subtitle else "Système de suivi de Scolarité", color = Kaki, fontSize = 10.sp)
             }
             IconButton(onClick = logout) {
                 Icon(Icons.Default.Logout, "Déconnexion", tint = DarkGreen)
@@ -535,60 +570,18 @@ private fun Header(title: String, subtitle: String, logout: () -> Unit) {
 }
 
 @Composable
-private fun CanteenHome(api: ConnectTestApi, code: String, staffName: String, onExit: () -> Unit, logout: () -> Unit) {
-    var menu by remember { mutableStateOf("") }
-    var photo1 by remember { mutableStateOf<Uri?>(null) }
-    var photo2 by remember { mutableStateOf<Uri?>(null) }
-    val context = LocalContext.current
-    val picker1 = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { photo1 = it }
-    val picker2 = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { photo2 = it }
-    var rows by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
-    var notices by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
-    var error by remember { mutableStateOf("") }
-    var busy by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    BackHandler { onExit() }
-    LaunchedEffect(Unit) { runCatching { rows = withContext(Dispatchers.IO) { api.canteenMenu() }; notices = withContext(Dispatchers.IO) { api.canteenAnnouncements(code) } }.onFailure { error = it.message ?: "Chargement impossible" } }
-    Column(Modifier.fillMaxSize().padding(18.dp)) {
-        Header("ESPACE CANTINE", staffName, logout)
-        Text("Messages de la Direction", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DarkGreen)
-        notices.forEach { n -> Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) { Column(Modifier.padding(10.dp)) { Text(n.optString("title"), fontWeight = FontWeight.Bold); Text(n.optString("body")); Text(n.optString("created_at"), fontSize = 10.sp, color = Kaki) } } }
-        Spacer(Modifier.height(12.dp))
-        Text("Menu du jour", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
-        Text("Une seule publication quotidienne est autorisée pour toute l'équipe de cantine.", color = Kaki, fontSize = 12.sp)
-        Spacer(Modifier.height(10.dp))
-        OutlinedTextField(menu, { menu = it }, Modifier.fillMaxWidth(), label = { Text("Nom / description du plat") })
-        Spacer(Modifier.height(8.dp))
-        OutlinedButton(onClick = { picker1.launch("image/*") }, modifier = Modifier.fillMaxWidth()) { Text(if (photo1 == null) "CHOISIR LA PHOTO 1" else "PHOTO 1 SÉLECTIONNÉE ✓") }
-        Spacer(Modifier.height(8.dp))
-        OutlinedButton(onClick = { picker2.launch("image/*") }, modifier = Modifier.fillMaxWidth()) { Text(if (photo2 == null) "CHOISIR LA PHOTO 2" else "PHOTO 2 SÉLECTIONNÉE ✓") }
-        Spacer(Modifier.height(10.dp))
-        Button(onClick = { if (menu.isBlank() || photo1 == null || photo2 == null) error = "Saisissez le nom du plat et sélectionnez les deux photos." else { busy = true; error = ""; scope.launch { runCatching { val urls = withContext(Dispatchers.IO) { api.uploadCanteenPhoto(context, photo1!!) to api.uploadCanteenPhoto(context, photo2!!) }; withContext(Dispatchers.IO) { api.saveCanteenMenu(code, menu.trim(), urls.first, urls.second) }; rows = withContext(Dispatchers.IO) { api.canteenMenu() }; menu = ""; photo1 = null; photo2 = null }.onFailure { error = it.message ?: "Publication impossible" }; busy = false } } }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(if (busy) "Publication…" else "PUBLIER LE MENU ET LES PHOTOS") }
-        if (error.isNotBlank()) Text(error, color = Red, fontSize = 12.sp)
-        Spacer(Modifier.height(18.dp))
-        Text("Menus publiés", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DarkGreen)
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) { items(rows) { row ->
-            Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp)) {
-                Text("${row.optString("meal_date")} • ${row.optString("menu_name")}", fontWeight = FontWeight.Bold)
-                Text("Publié par ${row.optString("created_by_name")}", fontSize = 11.sp, color = Kaki)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf(row.optString("photo1_url"), row.optString("photo2_url")).forEach { url -> AsyncImage(model = url, contentDescription = "Plat de la cantine", modifier = Modifier.weight(1f).height(100.dp), contentScale = ContentScale.Crop) } }
-            } }
-        } }
-    }
-}
-
-@Composable
 private fun ParentHome(api: ConnectTestApi, code: String, parentName: String, onExit: () -> Unit, logout: () -> Unit) {
     var children by remember { mutableStateOf<List<Child>>(emptyList()) }
-    var feeSummary by remember { mutableStateOf<List<ParentFee>>(emptyList()) }
-    var canteenRows by remember { mutableStateOf<List<JSONObject>>(emptyList()) }
     var selected by remember { mutableStateOf<Child?>(null) }
     var error by remember { mutableStateOf("") }
     BackHandler { if (selected != null) selected = null else onExit() }
-    LaunchedEffect(Unit) { try { children = withContext(Dispatchers.IO) { api.parentChildren(code) }; feeSummary = withContext(Dispatchers.IO) { api.parentFees(code) }; canteenRows = withContext(Dispatchers.IO) { api.canteenMenu() } } catch (_: Exception) { error = "Impossible de charger certaines informations du compte." } }
+    val parentLevel = selected?.level ?: "college"
+    SideEffect { Palette.level = parentLevel }
+    DisposableEffect(Unit) { onDispose { Palette.level = "college" } }
+    LaunchedEffect(Unit) { try { children = withContext(Dispatchers.IO) { api.parentChildren(code) } } catch (_: Exception) { error = "Impossible de charger les enfants." } }
     if (selected == null) {
         Column(Modifier.fillMaxSize().padding(20.dp)) {
-            Header("SAINT JEAN PAUL II", "Complexe Scolaire", logout)
+            Header("ESPACE PARENT", "", logout)
             Text("Bienvenu(e) Mr/Mme $parentName", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
             Spacer(Modifier.height(8.dp))
             Text("Mes enfants", fontSize = 25.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
@@ -603,32 +596,6 @@ private fun ParentHome(api: ConnectTestApi, code: String, parentName: String, on
                     }
                 }
             } }
-            Spacer(Modifier.height(18.dp))
-            Text("Frais de scolarité", fontSize = 21.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
-            feeSummary.forEach { f ->
-                Card(Modifier.fillMaxWidth().padding(vertical = 5.dp), shape = RoundedCornerShape(14.dp)) {
-                    Column(Modifier.padding(13.dp)) {
-                        Text("${f.studentName} • ${f.className}", fontWeight = FontWeight.Bold)
-                        Text("Total à payer : ${String.format(Locale.FRANCE, "%,.0f", f.due)} FCFA", fontSize = 12.sp)
-                        Text("Déjà payé : ${String.format(Locale.FRANCE, "%,.0f", f.paid)} FCFA", color = DarkGreen, fontWeight = FontWeight.SemiBold)
-                        Text("Reste à payer : ${String.format(Locale.FRANCE, "%,.0f", f.remaining)} FCFA", color = Red, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-            Spacer(Modifier.height(18.dp))
-            Text("Repas de la cantine", fontSize = 21.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
-            canteenRows.forEach { meal ->
-                Card(Modifier.fillMaxWidth().padding(vertical = 5.dp), shape = RoundedCornerShape(14.dp)) {
-                    Column(Modifier.padding(12.dp)) {
-                        Text("${meal.optString("meal_date")} • ${meal.optString("menu_name")}", fontWeight = FontWeight.Bold)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf(meal.optString("photo1_url"), meal.optString("photo2_url")).filter { it.startsWith("http") }.forEach { url ->
-                                AsyncImage(model = url, contentDescription = "Photo du repas", modifier = Modifier.weight(1f).height(110.dp), contentScale = ContentScale.Crop)
-                            }
-                        }
-                    }
-                }
-            }
         }
     } else ParentChildScreen(api, code, selected!!, { selected = null })
 }
@@ -669,10 +636,14 @@ private fun ParentChildScreen(api: ConnectTestApi, code: String, child: Child, b
                     page = "news"
                 }
                 ParentAction("Voir les enseignants de mon enfant", Icons.Default.Groups) { page = "chat" }
+                ParentAction("Frais de scolarité", Icons.Default.Payments) { page = "fees" }
+                ParentAction("Cantine : ce que mon enfant a mangé", Icons.Default.Restaurant) { page = "canteen" }
             }
             "notes" -> NotesScreen(api, code, child) { page = "menu" }
             "news" -> NewsScreen(api, code, child) { page = "menu" }
             "chat" -> ChatScreen(api, code, child) { page = "menu" }
+            "fees" -> FeesScreen(api, code, child) { page = "menu" }
+            "canteen" -> CanteenViewer(api, code, "Cantine", "Repas de ${child.name}") { page = "menu" }
         }
     }
 }
@@ -681,7 +652,7 @@ private fun ParentChildScreen(api: ConnectTestApi, code: String, child: Child, b
 private fun ParentAction(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, badge: String? = null, onClick: () -> Unit) {
     Card(Modifier.fillMaxWidth().padding(vertical = 7.dp).clickable(onClick = onClick), shape = RoundedCornerShape(18.dp)) {
         Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, tint = DarkGreen, modifier = Modifier.size(30.dp))
+            Icon(icon, null, tint = Accent, modifier = Modifier.size(30.dp))
             Spacer(Modifier.width(18.dp))
             Column(Modifier.weight(1f)) {
                 Text(label, fontSize = 17.sp, fontWeight = FontWeight.Bold)
@@ -890,6 +861,9 @@ private fun TeacherHome(api: ConnectTestApi, code: String, teacherName: String, 
     var selectedConversation by remember { mutableStateOf<TeacherConversation?>(null) }
     val scope = rememberCoroutineScope()
 
+    val teacherLevel = selectedAssignment?.level ?: "college"
+    SideEffect { Palette.level = teacherLevel }
+    DisposableEffect(Unit) { onDispose { Palette.level = "college" } }
     BackHandler(enabled = true) {
         when (step) {
             "home" -> onExit()
@@ -1029,3 +1003,424 @@ private fun TeacherConversationScreen(api: ConnectTestApi, code: String, convers
     }
 }
 
+
+// ============================================================================
+// COMPLEXE SCOLAIRE SAINT JEAN PAUL II — Drapeau, frais de scolarité, cantine
+// ============================================================================
+
+/** Drapeau du Togo : 5 bandes vertes/jaunes, carré rouge avec étoile blanche. */
+@Composable
+private fun TogoFlag(modifier: Modifier = Modifier) {
+    Canvas(modifier.clip(RoundedCornerShape(2.dp))) {
+        val h = size.height / 5f
+        val green = Color(0xFF006A4E)
+        val yellow = Color(0xFFFFCE00)
+        val red = Color(0xFFD21034)
+        for (i in 0 until 5) {
+            drawRect(if (i % 2 == 0) green else yellow, topLeft = Offset(0f, h * i), size = Size(size.width, h))
+        }
+        drawRect(red, topLeft = Offset(0f, 0f), size = Size(h * 3f, h * 3f))
+        val cx = h * 1.5f
+        val cy = h * 1.5f
+        val outer = h * 1.0f
+        val inner = outer * 0.382f
+        val star = Path()
+        for (k in 0 until 10) {
+            val r = if (k % 2 == 0) outer else inner
+            val ang = Math.toRadians(-90.0 + k * 36.0)
+            val x = cx + (r * Math.cos(ang)).toFloat()
+            val y = cy + (r * Math.sin(ang)).toFloat()
+            if (k == 0) star.moveTo(x, y) else star.lineTo(x, y)
+        }
+        star.close()
+        drawPath(star, Color.White)
+    }
+}
+
+private fun fcfa(v: Double): String =
+    String.format(Locale.FRANCE, "%,.0f", v).replace('\u202f', ' ').replace('\u00a0', ' ') + " FCFA"
+
+private fun dayFr(iso: String): String =
+    iso.split('-').let { if (it.size == 3) "${it[2]}/${it[1]}/${it[0]}" else iso }
+
+private fun dayLabel(iso: String): String = runCatching {
+    val d = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(iso)!!
+    SimpleDateFormat("EEE dd/MM", Locale.FRANCE).format(d)
+}.getOrDefault(iso)
+
+private fun decodeBase64Image(b64: String): androidx.compose.ui.graphics.ImageBitmap? = runCatching {
+    val bytes = android.util.Base64.decode(b64, android.util.Base64.DEFAULT)
+    android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+}.getOrNull()
+
+/** Réduit la photo (1000 px max, JPEG 72 %) et la renvoie en base64 pour l'envoi. */
+private fun uriToBase64(context: Context, uri: Uri): String? = runCatching {
+    val resolver = context.contentResolver
+    val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    resolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, bounds) }
+    var sample = 1
+    while (bounds.outWidth / sample > 2000 || bounds.outHeight / sample > 2000) sample *= 2
+    val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
+    var bmp: android.graphics.Bitmap = resolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, opts) }
+        ?: return@runCatching null
+    val rotation: Float = resolver.openInputStream(uri)?.use { stream ->
+        when (android.media.ExifInterface(stream).getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION, 1)) {
+            6 -> 90f
+            3 -> 180f
+            8 -> 270f
+            else -> 0f
+        }
+    } ?: 0f
+    if (rotation != 0f) {
+        val m = android.graphics.Matrix()
+        m.postRotate(rotation)
+        bmp = android.graphics.Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, m, true)
+    }
+    val maxSide = 1000f
+    val scale = minOf(1f, maxSide / maxOf(bmp.width, bmp.height).toFloat())
+    if (scale < 1f) {
+        bmp = android.graphics.Bitmap.createScaledBitmap(bmp, (bmp.width * scale).toInt(), (bmp.height * scale).toInt(), true)
+    }
+    val out = java.io.ByteArrayOutputStream()
+    bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 72, out)
+    android.util.Base64.encodeToString(out.toByteArray(), android.util.Base64.NO_WRAP)
+}.getOrNull()
+
+@Composable
+private fun Base64Photo(b64: String, modifier: Modifier = Modifier) {
+    val img = remember(b64) { decodeBase64Image(b64) }
+    if (img != null) {
+        Image(img, contentDescription = "Photo du plat", modifier = modifier.clip(RoundedCornerShape(16.dp)), contentScale = ContentScale.Crop)
+    } else {
+        Box(modifier.clip(RoundedCornerShape(16.dp)).background(Beurre), Alignment.Center) { Text("Photo indisponible", color = Kaki, fontSize = 12.sp) }
+    }
+}
+
+/** Parent : frais de scolarité de l'enfant (déjà payé, reste à payer, tranches). */
+@Composable
+private fun FeesScreen(api: ConnectTestApi, code: String, child: Child, back: () -> Unit) {
+    var info by remember { mutableStateOf<FeeInfo?>(null) }
+    var error by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(true) }
+    BackHandler { back() }
+    LaunchedEffect(child.id) {
+        loading = true
+        runCatching { withContext(Dispatchers.IO) { api.parentFees(code, child.id) } }
+            .onSuccess { info = it; error = "" }
+            .onFailure { error = it.message ?: "Chargement impossible." }
+        loading = false
+    }
+    PollWhileVisible(30_000L) { info = withContext(Dispatchers.IO) { api.parentFees(code, child.id) } }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        Text("Frais de scolarité", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+        Spacer(Modifier.height(10.dp))
+        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (error.isNotBlank()) Text("Erreur : $error", color = Red, fontSize = 12.sp)
+        val f = info
+        if (f != null) {
+            if (!f.defined) {
+                Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Beurre)) {
+                    Text("Le montant total des frais de ${f.className} n'est pas encore défini par la Direction.", modifier = Modifier.padding(18.dp), color = Black)
+                }
+                Spacer(Modifier.height(10.dp))
+            }
+            Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp)) {
+                Column(Modifier.padding(20.dp)) {
+                    Text("${child.name} • ${f.className}", color = Kaki, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(10.dp))
+                    Text("DÉJÀ PAYÉ", color = Kaki, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(fcfa(f.paid), color = Color(0xFF14804A), fontSize = 30.sp, fontWeight = FontWeight.Black)
+                    if (f.defined) {
+                        Spacer(Modifier.height(10.dp))
+                        Text("RESTE À PAYER", color = Kaki, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(fcfa(f.remaining), color = if (f.remaining > 0) Red else Color(0xFF14804A), fontSize = 30.sp, fontWeight = FontWeight.Black)
+                        Spacer(Modifier.height(10.dp))
+                        Text("Total à payer : ${fcfa(f.totalDue)}", color = Black, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Spacer(Modifier.height(8.dp))
+                        val frac = if (f.totalDue > 0) (f.paid / f.totalDue).toFloat().coerceIn(0f, 1f) else 0f
+                        LinearProgressIndicator(progress = { frac }, modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(8.dp)), color = Accent)
+                        Text("${(frac * 100).toInt()} % payé", color = Kaki, fontSize = 11.sp)
+                    }
+                }
+            }
+            Spacer(Modifier.height(14.dp))
+            Text("Tranches payées (${f.payments.size})", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+            Spacer(Modifier.height(6.dp))
+            if (f.payments.isEmpty()) Text("Aucun paiement enregistré pour le moment.", color = Kaki)
+            f.payments.forEach { p ->
+                Card(Modifier.fillMaxWidth().padding(vertical = 4.dp), shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = Beurre)) {
+                    Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Tranche N° ${p.no}", fontWeight = FontWeight.Bold)
+                            Text(dayFr(p.paidAt), color = Kaki, fontSize = 12.sp)
+                        }
+                        Text(fcfa(p.amount), fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Parent ou cantine : menus de la semaine, par date, avec les photos des plats. */
+@Composable
+private fun CanteenViewer(api: ConnectTestApi, code: String, title: String, subtitle: String, back: () -> Unit) {
+    var dates by remember { mutableStateOf<List<MenuDate>>(emptyList()) }
+    var selected by remember { mutableStateOf<String?>(null) }
+    var day by remember { mutableStateOf<CanteenDay?>(null) }
+    var loading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf("") }
+    BackHandler { back() }
+    LaunchedEffect(Unit) {
+        loading = true
+        runCatching { withContext(Dispatchers.IO) { api.canteenDates(code) } }
+            .onSuccess { list -> dates = list; if (selected == null) selected = list.firstOrNull()?.date; error = "" }
+            .onFailure { error = it.message ?: "Chargement impossible." }
+        loading = false
+    }
+    LaunchedEffect(selected) {
+        val d = selected
+        if (d != null) {
+            day = null
+            runCatching { withContext(Dispatchers.IO) { api.canteenMenu(code, d) } }
+                .onSuccess { day = it }
+                .onFailure { error = it.message ?: "Chargement impossible." }
+        }
+    }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        Text(title, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+        Text(subtitle, color = Kaki, fontSize = 13.sp)
+        Spacer(Modifier.height(10.dp))
+        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (error.isNotBlank()) Text("Erreur : $error", color = Red, fontSize = 12.sp)
+        if (!loading && dates.isEmpty() && error.isBlank()) {
+            Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Beurre)) {
+                Text("Aucun menu enregistré cette semaine. Les menus et photos sont effacés chaque dimanche à 00h GMT.", modifier = Modifier.padding(18.dp), color = Black)
+            }
+        }
+        if (dates.isNotEmpty()) {
+            Text("Choisissez une date", color = Kaki, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(6.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(dates) { d ->
+                    FilterChip(selected = selected == d.date, onClick = { selected = d.date }, label = { Text(dayLabel(d.date), fontSize = 12.sp) })
+                }
+            }
+            Spacer(Modifier.height(14.dp))
+        }
+        val m = day
+        if (m != null) {
+            if (!m.exists) {
+                Text("Aucun menu pour cette date.", color = Kaki)
+            } else {
+                Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
+                    Column(Modifier.padding(18.dp)) {
+                        Text(dayFr(m.date), color = Kaki, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(m.dishName, fontSize = 22.sp, fontWeight = FontWeight.Black, color = DarkGreen)
+                        if (m.description.isNotBlank()) Text(m.description, color = Black, fontSize = 14.sp)
+                        if (m.staffName.isNotBlank()) Text("Préparé par ${m.staffName}", color = Kaki, fontSize = 11.sp)
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+                if (m.photos.isEmpty()) Text("Pas de photo pour ce plat.", color = Kaki)
+                m.photos.forEach { ph ->
+                    Base64Photo(ph, Modifier.fillMaxWidth().height(230.dp))
+                    Spacer(Modifier.height(10.dp))
+                }
+            }
+        }
+    }
+}
+
+/** Personnel de cantine : saisie du plat du jour + 2 photos (une seule fois pour toute la cantine). */
+@Composable
+private fun CanteenTodayScreen(api: ConnectTestApi, code: String, back: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var day by remember { mutableStateOf<CanteenDay?>(null) }
+    var dish by remember { mutableStateOf("") }
+    var desc by remember { mutableStateOf("") }
+    var pending by remember { mutableStateOf<List<String>>(emptyList()) }
+    var message by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    BackHandler { back() }
+
+    fun reload() {
+        scope.launch {
+            runCatching { withContext(Dispatchers.IO) { api.canteenToday(code) } }
+                .onSuccess { d ->
+                    day = d
+                    if (d.exists && dish.isBlank()) { dish = d.dishName; desc = d.description }
+                }
+                .onFailure { message = it.message?.take(200) ?: "Chargement impossible." }
+        }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    fun addPicked(uri: Uri) {
+        scope.launch {
+            val b64 = withContext(Dispatchers.IO) { uriToBase64(context, uri) }
+            if (b64 == null) {
+                message = "Photo illisible, réessayez."
+            } else {
+                val room = 2 - (day?.photos?.size ?: 0)
+                pending = (pending + b64).takeLast(maxOf(room, 0))
+                message = ""
+            }
+        }
+    }
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) addPicked(uri)
+    }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok: Boolean ->
+        val uri = cameraUri
+        if (ok && uri != null) addPicked(uri)
+    }
+    fun launchCamera() {
+        val dir = java.io.File(context.cacheDir, "images").apply { mkdirs() }
+        val file = java.io.File(dir, "plat_${System.currentTimeMillis()}.jpg")
+        val uri = androidx.core.content.FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
+        cameraUri = uri
+        cameraLauncher.launch(uri)
+    }
+
+    val d = day
+    val savedPhotos = d?.photos ?: emptyList()
+    val locked = d?.locked == true
+    val room = 2 - savedPhotos.size
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        Text("Menu du jour", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+        if (d != null) Text(dayFr(d.date) + " (heure GMT)", color = Kaki, fontSize = 12.sp)
+        Spacer(Modifier.height(10.dp))
+        if (d == null) LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (locked) {
+            Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Beurre)) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("Plat du jour complet", fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+                    Text("Les 2 photos ont déjà été ajoutées${if (!d?.staffName.isNullOrBlank()) " (menu de ${d?.staffName})" else ""}. Vous pouvez les consulter.", color = Black, fontSize = 13.sp)
+                }
+            }
+            Spacer(Modifier.height(10.dp))
+            Text(d?.dishName ?: "", fontSize = 22.sp, fontWeight = FontWeight.Black, color = DarkGreen)
+            if (!d?.description.isNullOrBlank()) Text(d?.description ?: "", color = Black)
+            Spacer(Modifier.height(8.dp))
+        } else if (d != null) {
+            OutlinedTextField(dish, { dish = it }, Modifier.fillMaxWidth(), label = { Text("Nom du plat du jour") }, singleLine = true, shape = RoundedCornerShape(14.dp))
+            Spacer(Modifier.height(8.dp))
+            OutlinedTextField(desc, { desc = it }, Modifier.fillMaxWidth(), label = { Text("Détails (facultatif)") }, maxLines = 3, shape = RoundedCornerShape(14.dp))
+            Spacer(Modifier.height(12.dp))
+            Text("Photos du plat (2 maximum pour toute la cantine) — ${savedPhotos.size} déjà ajoutée${if (savedPhotos.size > 1) "s" else ""}", color = Kaki, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(8.dp))
+        }
+        savedPhotos.forEach { ph ->
+            Base64Photo(ph, Modifier.fillMaxWidth().height(200.dp))
+            Spacer(Modifier.height(8.dp))
+        }
+        if (!locked && d != null) {
+            pending.forEachIndexed { idx, ph ->
+                Box(Modifier.fillMaxWidth()) {
+                    Base64Photo(ph, Modifier.fillMaxWidth().height(200.dp))
+                    TextButton(onClick = { pending = pending.filterIndexed { i, _ -> i != idx } }, modifier = Modifier.align(Alignment.TopEnd)) { Text("Retirer", color = Red, fontWeight = FontWeight.Bold) }
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+            if (pending.size < room) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedButton(onClick = { launchCamera() }, modifier = Modifier.weight(1f).height(50.dp), shape = RoundedCornerShape(14.dp)) {
+                        Icon(Icons.Default.PhotoCamera, null); Spacer(Modifier.width(6.dp)); Text("Prendre une photo", fontSize = 12.sp)
+                    }
+                    OutlinedButton(onClick = { galleryLauncher.launch("image/*") }, modifier = Modifier.weight(1f).height(50.dp), shape = RoundedCornerShape(14.dp)) {
+                        Icon(Icons.Default.PhotoLibrary, null); Spacer(Modifier.width(6.dp)); Text("Galerie", fontSize = 12.sp)
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+            Button(
+                onClick = {
+                    if (dish.isBlank()) {
+                        message = "Saisissez le nom du plat."
+                    } else {
+                        scope.launch {
+                            busy = true; message = ""
+                            try {
+                                val toSend = pending
+                                withContext(Dispatchers.IO) {
+                                    api.canteenSaveMenu(code, dish.trim(), desc.trim())
+                                    toSend.forEach { api.canteenAddPhoto(code, it) }
+                                }
+                                pending = emptyList()
+                                message = "Plat du jour enregistré."
+                            } catch (e: Exception) {
+                                pending = emptyList()
+                                message = "Erreur : " + (e.message?.take(200) ?: "enregistrement impossible")
+                            } finally {
+                                busy = false
+                                reload()
+                            }
+                        }
+                    }
+                },
+                enabled = !busy,
+                modifier = Modifier.fillMaxWidth().height(54.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) { Text(if (busy) "Envoi en cours..." else "ENREGISTRER LE PLAT DU JOUR", fontWeight = FontWeight.Bold) }
+        }
+        if (message.isNotBlank()) {
+            Spacer(Modifier.height(10.dp))
+            Text(message, color = if (message.startsWith("Erreur")) Red else DarkGreen, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+@Composable
+private fun CanteenDirectionScreen(api: ConnectTestApi, code: String, back: () -> Unit) {
+    var items by remember { mutableStateOf<List<Announcement>>(emptyList()) }
+    val scope = rememberCoroutineScope()
+    BackHandler { back() }
+    fun refresh() { scope.launch { runCatching { items = withContext(Dispatchers.IO) { api.canteenAnnouncements(code) } } } }
+    LaunchedEffect(Unit) { refresh() }
+    PollWhileVisible(20_000L) { items = withContext(Dispatchers.IO) { api.canteenAnnouncements(code) } }
+    Column(Modifier.fillMaxSize()) {
+        Text("Message de la Direction", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+        Spacer(Modifier.height(12.dp))
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(items) { n ->
+                val c = if (n.importance == "urgent") Red else Navy
+                Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text(n.title, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
+                        Text(n.createdAt, color = Kaki, fontSize = 11.sp)
+                        Spacer(Modifier.height(6.dp))
+                        Text(n.body)
+                        Spacer(Modifier.height(8.dp))
+                        Box(Modifier.fillMaxWidth().height(4.dp).background(c, RoundedCornerShape(4.dp)))
+                    }
+                }
+            }
+        }
+        if (items.isEmpty()) Text("Aucun message de la Direction.", color = Kaki)
+    }
+}
+
+@Composable
+private fun CanteenHome(api: ConnectTestApi, code: String, name: String, onExit: () -> Unit, logout: () -> Unit) {
+    var step by remember { mutableStateOf("home") }
+    BackHandler { if (step == "home") onExit() else step = "home" }
+    Column(Modifier.fillMaxSize().padding(20.dp)) {
+        Header("ESPACE CANTINE", "", logout)
+        when (step) {
+            "home" -> {
+                Text("Bienvenue $name", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+                Spacer(Modifier.height(18.dp))
+                ParentAction("Menu du jour (nom + 2 photos)", Icons.Default.Restaurant) { step = "today" }
+                ParentAction("Menus de la semaine", Icons.Default.PhotoLibrary) { step = "week" }
+                ParentAction("Message de la Direction", Icons.Default.Campaign) { step = "direction" }
+            }
+            "today" -> CanteenTodayScreen(api, code) { step = "home" }
+            "week" -> CanteenViewer(api, code, "Menus de la semaine", "Effacement automatique chaque dimanche à 00h GMT") { step = "home" }
+            "direction" -> CanteenDirectionScreen(api, code) { step = "home" }
+        }
+    }
+}
