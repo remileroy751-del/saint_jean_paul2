@@ -128,7 +128,7 @@ class ConnectTestNotificationService : Service() {
         )
         return NotificationCompat.Builder(this, CHANNEL_BACKGROUND)
             .setSmallIcon(R.drawable.ic_stat_connect_test)
-            .setColor(0xFF040678.toInt())
+            .setColor(0xFF0B1F44.toInt())
             .setContentTitle("Saint Jean Paul II")
             .setContentText("")
             .setShowWhen(false)
@@ -153,7 +153,7 @@ class ConnectTestNotificationService : Service() {
         val title = item.title.ifBlank { "Nouveau message — Saint Jean Paul II" }
         val notification = NotificationCompat.Builder(this, CHANNEL_MESSAGES)
             .setSmallIcon(R.drawable.ic_stat_connect_test)
-            .setColor(0xFF040678.toInt())
+            .setColor(0xFF0B1F44.toInt())
             .setContentTitle(title)
             .setContentText(item.body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(item.body))

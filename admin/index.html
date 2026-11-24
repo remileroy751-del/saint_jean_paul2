@@ -9,12 +9,12 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 :root{
-  --navy:#040678;--navy2:#0B0FA6;--navy-dark:#02034F;
+  --navy:#0B1F44;--navy2:#14306A;--navy-dark:#06142F;
   --yellow:#FCEE76;--yellow-pale:#FFF9D2;--yellow-deep:#E9D63A;
   --pink:#EC5F9E;--pink-pale:#FDE7F1;--pink-deep:#C93B7C;
   --white:#fff;--bg:#F7F7FC;--text:#12122B;--muted:#5C6080;--line:#DCDDF0;
   --green:#14804A;--green-pale:#DDF3E7;--red:#B3261E;--red-pale:#FBE4E2;--orange:#9A6A00;--orange-pale:#FFF1CC;
-  --shadow:0 14px 40px rgba(4,6,120,.10);
+  --shadow:0 14px 40px rgba(11,31,68,.10);
   /* thème actif (modifié par .lvl-primaire / .lvl-college) */
   --accent:var(--yellow);--accent-ink:var(--navy);--tint:var(--yellow-pale);--accent-deep:var(--yellow-deep);
 }
@@ -24,14 +24,14 @@ body.lvl-primaire{--accent:var(--pink);--accent-ink:#fff;--tint:var(--pink-pale)
 body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}.muted{color:var(--muted)}
 .login{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top right,#FFF9D2 0,#FFFFFF 40%,#E9EAFB 100%)}
-.login-card{width:min(500px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:34px;box-shadow:0 30px 90px rgba(4,6,120,.18);text-align:center}
+.login-card{width:min(500px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:34px;box-shadow:0 30px 90px rgba(11,31,68,.18);text-align:center}
 .login-card .admin-logo{width:150px;height:150px;object-fit:contain;margin:0 auto 12px;display:block}
 .login h1{margin:0;color:var(--navy);font-size:25px;letter-spacing:-.3px;line-height:1.15}.login h1 span{display:block;font-size:30px;font-weight:950}
 .republic{font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
 .tag{margin:8px 0 22px;font-size:13px}
 .field{display:grid;gap:7px;margin:11px 0;text-align:left}.field label{font-weight:800;font-size:13px;color:var(--navy)}
 .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px 13px;outline:none;color:var(--text)}
-.field input:focus,.field select:focus,.field textarea:focus,.search input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(4,6,120,.14)}
+.field input:focus,.field select:focus,.field textarea:focus,.search input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,31,68,.14)}
 .field textarea{min-height:110px;resize:vertical}
 .btn{border:0;border-radius:12px;padding:11px 15px;background:var(--navy);color:#fff;font-weight:850;transition:.18s ease}
 .btn:hover{transform:translateY(-1px);filter:brightness(1.12)}.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
@@ -40,7 +40,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .notice{padding:11px 13px;border-radius:12px;background:var(--tint);margin:12px 0;font-size:13px;color:var(--navy);text-align:left}
 .notice.danger{background:var(--red-pale);color:#7A1812}.notice.good{background:var(--green-pale);color:#0B5030}
 .app{min-height:100vh}
-.side{position:fixed;inset:0 auto 0 0;width:270px;background:linear-gradient(180deg,#040678 0%,#02034F 100%);color:#fff;padding:18px 14px;z-index:5;overflow:auto;box-shadow:12px 0 35px rgba(4,6,120,.14)}
+.side{position:fixed;inset:0 auto 0 0;width:270px;background:linear-gradient(180deg,#0B1F44 0%,#06142F 100%);color:#fff;padding:18px 14px;z-index:5;overflow:auto;box-shadow:12px 0 35px rgba(11,31,68,.14)}
 .side:after{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--accent)}
 .brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;margin:8px 6px 14px}
 .brand img{width:112px;height:112px;object-fit:contain;flex:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
@@ -57,7 +57,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .nav button.perm.active{background:var(--yellow);color:var(--navy)}
 .main{margin-left:270px;padding:0 26px 30px;max-width:1700px}
 .levelbar{position:sticky;top:0;z-index:4;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 0;background:linear-gradient(180deg,var(--bg) 75%,rgba(247,247,252,0))}
-.lvl-tab{border:2px solid var(--line);background:#fff;border-radius:18px;padding:14px 16px;text-align:left;transition:.18s;box-shadow:0 4px 14px rgba(4,6,120,.06);display:flex;flex-direction:column;gap:3px}
+.lvl-tab{border:2px solid var(--line);background:#fff;border-radius:18px;padding:14px 16px;text-align:left;transition:.18s;box-shadow:0 4px 14px rgba(11,31,68,.06);display:flex;flex-direction:column;gap:3px}
 .lvl-tab b{font-size:21px;letter-spacing:.5px;color:var(--navy)}.lvl-tab small{font-size:11px;color:var(--muted)}
 .lvl-tab.primaire.on{background:linear-gradient(120deg,var(--navy) 0%,var(--navy) 55%,var(--pink) 100%);border-color:var(--pink)}
 .lvl-tab.college.on{background:linear-gradient(120deg,var(--navy) 0%,var(--navy) 62%,var(--yellow) 100%);border-color:var(--yellow)}
@@ -89,7 +89,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .section h3{margin-top:0;color:var(--navy)}.hint{font-size:12px;color:var(--muted)}
 .code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:900;letter-spacing:2px;color:var(--navy);background:var(--yellow-pale);padding:2px 8px;border-radius:8px}
 .bigcode{font-size:30px;letter-spacing:6px;padding:8px 16px;display:inline-block;margin:6px 0}
-.modal{position:fixed;inset:0;background:rgba(2,3,79,.6);display:grid;place-items:center;padding:20px;z-index:20}
+.modal{position:fixed;inset:0;background:rgba(6,20,47,.6);display:grid;place-items:center;padding:20px;z-index:20}
 .modal-card{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:22px;border:1px solid var(--line)}
 .modal-card.wide{width:min(980px,100%)}
 .close{float:right;border:0;background:var(--tint);color:var(--navy);border-radius:10px;padding:7px 10px}
@@ -205,7 +205,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 <!-- ENSEIGNANTS -->
 <section id="teachers" class="section"><div class="two">
   <div class="card"><h3>Enregistrer un enseignant</h3><p class="hint">L'enseignant est enregistré dans l'interface du niveau actif. Un code d'accès est généré automatiquement.</p><div class="field"><label>Nom complet</label><input id="teacherName"></div><div class="field"><label>Téléphone</label><input id="teacherPhone"></div><button class="btn accent" onclick="createTeacher()">CRÉER L'ACCÈS ENSEIGNANT</button><div id="teacherMsg"></div></div>
-  <div class="card"><h3>Affecter enseignant / classe / matière</h3><div class="field"><label>Enseignant</label><select id="assignTeacher"></select></div><div class="field"><label>Classe</label><select id="assignClass"></select></div><div class="field"><label>Matière</label><select id="assignSubject"></select></div><div class="field"><label>Professeur titulaire de la classe ?</label><select id="assignHome"><option value="false">Non</option><option value="true">Oui</option></select></div><button class="btn" onclick="assignTeacher()">ENREGISTRER L'AFFECTATION</button><div id="assignMsg"></div></div>
+  <div class="card"><h3 id="assignTitle">Affecter enseignant / classe / matière</h3><p class="hint" id="assignHint"></p><div class="field"><label>Enseignant</label><select id="assignTeacher"></select></div><div class="field"><label>Classe</label><select id="assignClass"></select></div><div class="field" id="assignSubjectField"><label>Matière</label><select id="assignSubject"></select></div><div class="field" id="assignHomeField"><label>Professeur titulaire de la classe ?</label><select id="assignHome"><option value="false">Non</option><option value="true">Oui</option></select></div><button class="btn" id="assignBtn" onclick="assignTeacher()">ENREGISTRER L'AFFECTATION</button><div id="assignMsg"></div></div>
 </div>
 <div class="card" style="margin-top:15px"><div class="toolbar"><h3 style="margin:0">Enseignants &amp; affectations</h3><div class="search"><input id="teacherSearch" placeholder="Rechercher…" oninput="renderTeachers()"></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Enseignant</th><th>Téléphone</th><th>Classes / matières</th><th>Actions</th></tr></thead><tbody id="teachersBody"></tbody></table></div></div>
 </section>
@@ -313,7 +313,7 @@ const todayStr=()=>new Date().toISOString().slice(0,10);
 const levelName=l=>l==='primaire'?'Primaire':'Collège';
 
 let LEVEL=(()=>{try{return localStorage.getItem('sjp2_level')==='college'?'college':'primaire'}catch(e){return 'primaire'}})();
-let classes=[],subjects=[],parents=[],teachers=[],canteenStaff=[],students=[],links=[],assignments=[],notes=[],news=[],conversations=[],feeReport=[],classFees=[],todayMenu=null,accessCodes=[];
+let subjectLevels=[],classes=[],subjects=[],parents=[],teachers=[],canteenStaff=[],students=[],links=[],assignments=[],notes=[],news=[],conversations=[],feeReport=[],classFees=[],todayMenu=null,accessCodes=[];
 let newsStudentId=null;
 
 function notice(id,text,good=true){const e=$(id);if(!e)return;e.className='notice '+(good?'good':'danger');e.textContent=text}
@@ -324,6 +324,8 @@ async function fetchAll(make){let out=[],from=0;const step=1000;for(;;){const r=
 /* ---------- aides niveau actif ---------- */
 const lc=()=>classes.filter(c=>c.level===LEVEL);
 const lcIds=()=>new Set(lc().map(c=>c.id));
+const lsub=()=>{const ids=new Set(subjectLevels.filter(x=>x.level===LEVEL).map(x=>x.subject_id));return subjectLevels.length?subjects.filter(x=>ids.has(x.id)):subjects};
+const primaryCount=()=>subjectLevels.filter(x=>x.level==='primaire').length;
 const ls=()=>{const ids=lcIds();return students.filter(s=>ids.has(s.class_id))};
 const kidsOf=pid=>links.filter(x=>x.parent_id===pid).map(x=>students.find(s=>s.id===x.student_id)).filter(Boolean);
 const parentsOf=sid=>links.filter(x=>x.student_id===sid).map(x=>parents.find(p=>p.id===x.parent_id)).filter(Boolean);
@@ -413,7 +415,7 @@ function show(id){
 /* ---------- chargement ---------- */
 async function loadAll(){
   try{
-    const [cl,sub,par,tea,can,stu,lnk,asg,nts,ann,fr,cf,tm]=await Promise.all([
+    const [cl,sub,par,tea,can,stu,lnk,asg,nts,ann,fr,cf,tm,sl]=await Promise.all([
       sb.from('classes').select('*').order('sort_order'),
       sb.from('subjects').select('*').order('name'),
       fetchAll(()=>sb.from('parents').select('id,full_name,phone,parent_type,registered_level,created_at').order('full_name').order('id')),
@@ -426,10 +428,11 @@ async function loadAll(){
       sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(500),
       fetchAll(()=>sb.rpc('admin_fee_report')),
       sb.from('class_fees').select('class_id,total_amount'),
-      sb.from('canteen_menus').select('id,menu_date,dish_name,created_by_name,canteen_photos(id)').eq('menu_date',todayStr()).maybeSingle()
+      sb.from('canteen_menus').select('id,menu_date,dish_name,created_by_name,canteen_photos(id)').eq('menu_date',todayStr()).maybeSingle(),
+      sb.from('subject_levels').select('subject_id,level')
     ]);
     for(const r of [cl,sub,can,asg,nts,ann,cf]) if(r.error) throw r.error;
-    classes=cl.data||[];subjects=sub.data||[];parents=par;teachers=tea;canteenStaff=can.data||[];students=stu;links=lnk;
+    classes=cl.data||[];subjects=sub.data||[];subjectLevels=sl&&!sl.error?(sl.data||[]):[];parents=par;teachers=tea;canteenStaff=can.data||[];students=stu;links=lnk;
     assignments=asg.data||[];notes=nts.data||[];news=ann.data||[];feeReport=fr;classFees=cf.data||[];todayMenu=tm&&!tm.error?tm.data:null;
     await loadAccessCodes();
     renderAll();
@@ -439,7 +442,7 @@ function renderAll(){
   applyTheme();
   fill('assignTeacher',teachers.slice().sort(byName).map(t=>[t.id,t.full_name+(t.registered_level!==LEVEL?' ('+levelName(t.registered_level)+')':'')]));
   fill('assignClass',lc().map(x=>[x.id,x.name]));
-  fill('assignSubject',subjects.map(x=>[x.id,x.name]));
+  fill('assignSubject',lsub().map(x=>[x.id,x.name]));applyAssignMode();
   fill('noteClassFilter',lc().map(x=>[x.id,x.name]),'Toutes les classes du niveau');
   fillNewsTargets();
   renderDashboard();renderParents();renderClassDirectory();renderStudentSearch();renderTeachers();renderSchool();renderAssignments();renderNotes();renderNews();
@@ -562,11 +565,22 @@ async function deleteStudent(id){
 }
 
 /* ---------- enseignants, classes, matières ---------- */
+function teacherAssignText(a){
+  const lines=[],seen=new Set();
+  for(const y of a){
+    if(y.classes?.level==='primaire'){
+      if(seen.has(y.class_id))continue;seen.add(y.class_id);
+      const n=a.filter(z=>z.class_id===y.class_id).length;
+      lines.push(`${esc(y.classes?.name||'')} — enseignant de la classe, toutes les matières (${n}) <span class="pill green">Titulaire</span>`)
+    }else lines.push(`${esc(y.classes?.name||'')} — ${esc(y.subjects?.name||'')}${y.is_homeroom?' <span class="pill green">Titulaire</span>':''}`)
+  }
+  return lines.join('<br>')||'Aucune affectation'
+}
 function renderTeachers(){
   const t=norm($('teacherSearch')?.value||'');
   $('teachersBody').innerHTML=lt().filter(x=>norm(`${x.full_name} ${x.phone||''}`).includes(t)).sort(byName).map(x=>{
     const a=assignments.filter(y=>y.teacher_id===x.id);
-    return `<tr><td><b>${esc(x.full_name)}</b></td><td>${esc(x.phone||'—')}</td><td>${a.map(y=>`${esc(y.classes?.name||'')} — ${esc(y.subjects?.name||'')}${y.is_homeroom?' <span class="pill green">Titulaire</span>':''}`).join('<br>')||'Aucune affectation'}</td><td><div class="actions"><button class="btn small" onclick="resetTeacher('${x.id}')">Nouveau code</button><button class="btn red small" onclick="deleteTeacher('${x.id}')">Supprimer</button></div></td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Aucun enseignant dans ce niveau.</td></tr>'
+    return `<tr><td><b>${esc(x.full_name)}</b></td><td>${esc(x.phone||'—')}</td><td>${teacherAssignText(a)}</td><td><div class="actions"><button class="btn small" onclick="resetTeacher('${x.id}')">Nouveau code</button><button class="btn red small" onclick="deleteTeacher('${x.id}')">Supprimer</button></div></td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Aucun enseignant dans ce niveau.</td></tr>'
 }
 async function createTeacher(){
   const n=$('teacherName').value.trim(),p=$('teacherPhone').value.trim();if(!n)return notice('teacherMsg','Nom obligatoire.',false);
@@ -575,25 +589,52 @@ async function createTeacher(){
 }
 async function resetTeacher(id){if(!confirm('Générer un nouveau code pour cet enseignant ?'))return;const r=await sb.rpc('admin_reset_teacher_code',{p_teacher_id:id});if(r.error)return alert(r.error.message);alert('Nouveau code enseignant : '+r.data.teacher_code);await loadAccessCodes()}
 async function deleteTeacher(id){const t=teachers.find(x=>x.id===id);if(!confirm(`Supprimer l'enseignant ${t?.full_name||''} ? Ses affectations, notes et conversations seront supprimées.`))return;const r=await sb.from('teachers').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
+function applyAssignMode(){
+  const prim=LEVEL==='primaire';
+  $('assignSubjectField').style.display=prim?'none':'';
+  $('assignHomeField').style.display=prim?'none':'';
+  $('assignTitle').textContent=prim?"Affecter l'enseignant d'une classe":'Affecter enseignant / classe / matière';
+  $('assignHint').textContent=prim?"Au Primaire, chaque classe a un seul enseignant, qui assure toutes les matières. Toutes les matières du Primaire lui sont affectées automatiquement. Choisir un autre enseignant pour une classe remplace l'ancien (les notes déjà saisies sont conservées).":"Au Collège, plusieurs enseignants interviennent dans une même classe : affectez chaque matière à son enseignant.";
+  $('assignBtn').textContent=prim?"AFFECTER L'ENSEIGNANT À LA CLASSE":"ENREGISTRER L'AFFECTATION";
+}
 async function assignTeacher(){
+  if(LEVEL==='primaire'){
+    if(!$('assignTeacher').value||!$('assignClass').value)return notice('assignMsg','Choisissez enseignant et classe.',false);
+    const r=await sb.rpc('admin_assign_primary_teacher',{p_teacher_id:$('assignTeacher').value,p_class_id:$('assignClass').value});
+    if(r.error)return notice('assignMsg',r.error.message,false);notice('assignMsg',`Enseignant affecté à la classe avec ${r.data?.subjects_count??''} matières.`);await loadAll();return
+  }
   if(!$('assignTeacher').value||!$('assignClass').value||!$('assignSubject').value)return notice('assignMsg','Choisissez enseignant, classe et matière.',false);
   const r=await sb.rpc('admin_assign_teacher',{p_teacher_id:$('assignTeacher').value,p_class_id:$('assignClass').value,p_subject_id:$('assignSubject').value,p_is_homeroom:$('assignHome').value==='true'});
   if(r.error)return notice('assignMsg',r.error.message,false);notice('assignMsg','Affectation enregistrée.');await loadAll()
 }
 function renderSchool(){
   $('classesList').innerHTML=lc().map(c=>{const n=students.filter(s=>s.class_id===c.id).length;return `<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid #ECECF7"><span><b>${esc(c.name)}</b></span><span class="pill navy">${n} élève${n>1?'s':''}</span></div>`}).join('');
-  $('subjectsList').innerHTML=subjects.map(s=>`<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid #ECECF7"><b>${esc(s.name)}</b><button class="btn red small" onclick="deleteSubject('${s.id}')">Supprimer</button></div>`).join('')||'<div class="empty">Aucune matière</div>'
+  $('subjectsList').innerHTML=lsub().map(s=>`<div class="row" style="justify-content:space-between;padding:9px 0;border-bottom:1px solid #ECECF7"><b>${esc(s.name)}</b><button class="btn red small" onclick="deleteSubject('${s.id}')">Supprimer</button></div>`).join('')||'<div class="empty">Aucune matière</div>'
 }
-async function addSubject(){const n=$('newSubject').value.trim();if(!n)return;const r=await sb.from('subjects').insert({name:n}).select().single();if(r.error)return alert(r.error.message);$('newSubject').value='';await loadAll()}
-async function deleteSubject(id){if(!confirm('Supprimer cette matière ?'))return;const r=await sb.from('subjects').delete().eq('id',id);if(r.error)return alert(r.error.message);await loadAll()}
+async function addSubject(){const n=$('newSubject').value.trim();if(!n)return;const r=await sb.rpc('admin_add_subject',{p_name:n,p_level:LEVEL});if(r.error)return alert(r.error.message);$('newSubject').value='';await loadAll()}
+async function deleteSubject(id){const m=LEVEL==='primaire'?'Retirer cette matière du Primaire ? Elle sera retirée des enseignants de toutes les classes du Primaire (les notes saisies dans cette matière seront supprimées).':'Retirer cette matière du Collège ? Les affectations des enseignants du Collège pour cette matière seront supprimées (ainsi que les notes saisies).';if(!confirm(m))return;const r=await sb.rpc('admin_delete_subject',{p_subject_id:id,p_level:LEVEL});if(r.error)return alert(r.error.message);await loadAll()}
 function renderAssignments(){
-  const ids=lcIds();
-  $('assignmentsBody').innerHTML=assignments.filter(a=>ids.has(a.class_id)).map(a=>`<tr><td>${esc(a.teachers?.full_name||'')}</td><td>${esc(a.classes?.name||'')}</td><td>${esc(a.subjects?.name||'')}</td><td>${a.is_homeroom?'<span class="pill green">Oui</span>':'Non'}</td><td><div class="actions"><button class="btn small" onclick="editAssignment('${a.id}')">Modifier</button><button class="btn red small" onclick="deleteAssignment('${a.id}')">Retirer</button></div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Aucune affectation dans ce niveau.</td></tr>'
+  const ids=lcIds();const rows=[];const seen=new Set();
+  for(const a of assignments.filter(a=>ids.has(a.class_id))){
+    if(a.classes?.level==='primaire'){
+      if(seen.has(a.class_id))continue;seen.add(a.class_id);
+      const n=assignments.filter(z=>z.class_id===a.class_id).length;
+      rows.push(`<tr><td>${esc(a.teachers?.full_name||'')}</td><td>${esc(a.classes?.name||'')}</td><td>Toutes les matières (${n})</td><td><span class="pill green">Oui</span></td><td><div class="actions"><button class="btn small" onclick="editPrimaryTeacher('${a.class_id}')">Changer</button><button class="btn red small" onclick="removePrimaryTeacher('${a.class_id}')">Retirer</button></div></td></tr>`)
+    }else rows.push(`<tr><td>${esc(a.teachers?.full_name||'')}</td><td>${esc(a.classes?.name||'')}</td><td>${esc(a.subjects?.name||'')}</td><td>${a.is_homeroom?'<span class="pill green">Oui</span>':'Non'}</td><td><div class="actions"><button class="btn small" onclick="editAssignment('${a.id}')">Modifier</button><button class="btn red small" onclick="deleteAssignment('${a.id}')">Retirer</button></div></td></tr>`)
+  }
+  $('assignmentsBody').innerHTML=rows.join('')||'<tr><td colspan="5" class="empty">Aucune affectation dans ce niveau.</td></tr>'
 }
+function editPrimaryTeacher(classId){
+  const c=classes.find(x=>x.id===classId);const cur=assignments.find(x=>x.class_id===classId);
+  openModal(`<h2>Enseignant de la classe ${esc(c?.name||'')}</h2><p class="hint">Un seul enseignant par classe au Primaire. Il assure toutes les matières ; les notes déjà saisies sont conservées.</p><div class="field"><label>Enseignant</label><select id="editTeacher"></select></div><button class="btn accent" onclick="savePrimaryTeacher('${classId}')">ENREGISTRER</button>`);
+  fill('editTeacher',teachers.slice().sort(byName).map(x=>[x.id,x.full_name]));if(cur)$('editTeacher').value=cur.teacher_id
+}
+async function savePrimaryTeacher(classId){const r=await sb.rpc('admin_assign_primary_teacher',{p_teacher_id:$('editTeacher').value,p_class_id:classId});if(r.error)return alert(r.error.message);closeModal();await loadAll()}
+async function removePrimaryTeacher(classId){const c=classes.find(x=>x.id===classId);if(!confirm(`Retirer l'enseignant de la classe ${c?.name||''} ? Toutes ses affectations dans cette classe seront supprimées (ainsi que les notes saisies).`))return;const r=await sb.from('teacher_assignments').delete().eq('class_id',classId);if(r.error)return alert(r.error.message);await loadAll()}
 function editAssignment(id){
   const a=assignments.find(x=>x.id===id);if(!a)return;
   openModal(`<h2>Modifier l'affectation</h2><div class="field"><label>Enseignant</label><select id="editTeacher"></select></div><div class="field"><label>Classe</label><select id="editClass">${classOptions(a.class_id)}</select></div><div class="field"><label>Matière</label><select id="editSubject"></select></div><div class="field"><label>Titulaire de la classe ?</label><select id="editHome"><option value="false">Non</option><option value="true">Oui</option></select></div><button class="btn accent" onclick="saveAssignmentEdit('${id}')">ENREGISTRER LES MODIFICATIONS</button>`);
-  fill('editTeacher',teachers.slice().sort(byName).map(x=>[x.id,x.full_name]));fill('editSubject',subjects.map(x=>[x.id,x.name]));
+  fill('editTeacher',teachers.slice().sort(byName).map(x=>[x.id,x.full_name]));fill('editSubject',lsub().map(x=>[x.id,x.name]));
   $('editTeacher').value=a.teacher_id;$('editSubject').value=a.subject_id;$('editHome').value=String(!!a.is_homeroom)
 }
 async function saveAssignmentEdit(id){const r=await sb.rpc('admin_update_teacher_assignment',{p_assignment_id:id,p_teacher_id:$('editTeacher').value,p_class_id:$('editClass').value,p_subject_id:$('editSubject').value,p_is_homeroom:$('editHome').value==='true'});if(r.error)return alert(r.error.message);closeModal();await loadAll()}

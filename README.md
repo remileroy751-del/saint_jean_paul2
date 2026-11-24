@@ -7,7 +7,8 @@ République Togolaise · Contact permanent Enseignant / Parent / Direction.
 ## Contenu du dépôt
 - `app/` : application Android (code d'accès → espace Parent, Enseignant ou Cantine).
 - `admin/index.html` (et `index.html` à la racine pour GitHub Pages) : interface Direction.
-- `supabase/SCHEMA_SAINT_JEAN_PAUL_II.sql` : base de données complète.
+- `supabase/SCHEMA_SAINT_JEAN_PAUL_II.sql` : base de données complète (classes, matières par niveau, règle « un seul enseignant par classe au Primaire » incluses).
+- `supabase/MISES_A_JOUR/` : scripts à exécuter uniquement sur une base DÉJÀ installée (03 : classes et matières par niveau ; 04 : enseignant unique au Primaire).
 - `.github/workflows/android.yml` : compilation automatique de l'APK.
 
 ## Installation (ordre à suivre)
@@ -26,3 +27,9 @@ République Togolaise · Contact permanent Enseignant / Parent / Direction.
 - **Frais de scolarité** : montant total par classe (modifiable), jusqu'à 15 tranches par élève, recherche par nom, rapport avancé (filtres classe/statut/seuils, tris, export CSV/PDF). Les parents voient payé et reste à payer.
 - **Messages Direction** : tous les parents d'un niveau, d'une classe, un parent précis (recherche de l'élève), tous les enseignants, un enseignant, toute la cantine. La Direction lit et supprime tous les messages Parent ↔ Enseignant.
 - **Messagerie** Parent ↔ Enseignant : 5 messages par jour et par compte, remise à zéro à 00h GMT.
+
+
+## Enseignants : Primaire et Collège
+- **Primaire** : une classe = un seul enseignant, qui assure toutes les matières du Primaire (affectées automatiquement). Dans l'application Parent, « Voir les enseignants de mon enfant » affiche le nom de l'enseignant avec ses matières en dessous.
+- **Collège** : plusieurs enseignants par classe, chacun avec ses matières ; l'application Parent affiche chaque enseignant avec ses matières.
+- Couleur principale de l'interface : bleu marine foncé `#0B1F44`.

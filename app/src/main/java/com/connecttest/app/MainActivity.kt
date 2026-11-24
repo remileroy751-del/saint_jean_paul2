@@ -66,7 +66,7 @@ private object Palette {
     val primaire: Boolean get() = level == "primaire"
 }
 
-private val Navy = Color(0xFF040678)
+private val Navy = Color(0xFF0B1F44)
 private val LogoYellow = Color(0xFFFCEE76)
 private val PaleYellow = Color(0xFFFFF9D2)
 private val Pink = Color(0xFFEC5F9E)
@@ -85,7 +85,9 @@ private val Accent: Color get() = if (Palette.primaire) Pink else Navy
 private val HeaderBg: Color get() = if (Palette.primaire) PalePink else PaleYellow
 
 data class Child(val id: String, val name: String, val className: String, val level: String)
-data class Teacher(val id: String, val name: String, val subject: String, val homeroom: Boolean)
+data class Teacher(val id: String, val name: String, val subjects: List<String>, val homeroom: Boolean) {
+    val subject: String get() = subjects.joinToString(", ")
+}
 data class NoteRow(
     val subject: String,
     val homework: List<Pair<String, Double>>,
@@ -151,7 +153,17 @@ class ConnectTestApi {
     }
 
     fun teachersForChild(code: String, childId: String): List<Teacher> = arr(post("parent_child_teachers", JSONObject().put("p_code", code).put("p_student_id", childId))).let { a ->
-        (0 until a.length()).map { o -> a.getJSONObject(o).let { Teacher(it.getString("teacher_id"), it.getString("teacher_name"), it.getString("subject_name"), it.optBoolean("is_homeroom")) } }
+        val order = LinkedHashMap<String, Teacher>()
+        for (o in 0 until a.length()) {
+            val r = a.getJSONObject(o)
+            val id = r.getString("teacher_id")
+            val subject = r.optString("subject_name", "").trim()
+            val home = r.optBoolean("is_homeroom")
+            val cur = order[id]
+            order[id] = if (cur == null) Teacher(id, r.getString("teacher_name"), if (subject.isNotEmpty()) listOf(subject) else emptyList(), home)
+            else cur.copy(subjects = if (subject.isNotEmpty() && subject !in cur.subjects) cur.subjects + subject else cur.subjects, homeroom = cur.homeroom || home)
+        }
+        order.values.toList()
     }
 
     fun notes(code: String, childId: String, term: String): List<NoteRow> = arr(post("student_notes", JSONObject().put("p_code", code).put("p_student_id", childId).put("p_term", term))).let { a ->
@@ -768,8 +780,27 @@ private fun ChatScreen(api: ConnectTestApi, code: String, child: Child, back: ()
     var teachers by remember { mutableStateOf<List<Teacher>>(emptyList()) }; var teacher by remember { mutableStateOf<Teacher?>(null) }
     BackHandler { if (teacher == null) back() else teacher = null }
     LaunchedEffect(Unit) { runCatching { teachers = withContext(Dispatchers.IO) { api.teachersForChild(code, child.id) } } }
-    if (teacher == null) { Column(Modifier.fillMaxSize()) { Text("Enseignants de mon enfant", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen); Spacer(Modifier.height(6.dp)); Text("Cliquez sur le nom d'un enseignant pour lui envoyer un message", color = Kaki, fontSize = 12.sp); Spacer(Modifier.height(10.dp)); teachers.forEach { t -> ParentAction("${t.name} • ${t.subject}${if (t.homeroom) " • Titulaire" else ""}", Icons.Default.Person) { teacher = t } } } }
+    if (teacher == null) { Column(Modifier.fillMaxSize()) { Text("Enseignants de mon enfant", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen); Spacer(Modifier.height(6.dp)); Text("Cliquez sur le nom d'un enseignant pour lui envoyer un message", color = Kaki, fontSize = 12.sp); Spacer(Modifier.height(10.dp)); teachers.forEach { t -> TeacherCard(t) { teacher = t } }; if (teachers.isEmpty()) Text("Aucun enseignant n'est encore affecté à la classe de votre enfant.", color = Kaki, fontSize = 13.sp) } }
     else Conversation(api, code, child, teacher!!, { teacher = null })
+}
+
+@Composable
+private fun TeacherCard(t: Teacher, onClick: () -> Unit) {
+    Card(Modifier.fillMaxWidth().padding(vertical = 7.dp).clickable(onClick = onClick), shape = RoundedCornerShape(18.dp)) {
+        Row(Modifier.padding(20.dp), verticalAlignment = Alignment.Top) {
+            Icon(Icons.Default.Person, null, tint = Accent, modifier = Modifier.size(30.dp))
+            Spacer(Modifier.width(18.dp))
+            Column(Modifier.weight(1f)) {
+                Text(t.name, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+                if (t.homeroom) { Spacer(Modifier.height(2.dp)); Text("Titulaire de la classe", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Accent) }
+                if (t.subjects.isNotEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    t.subjects.forEach { subj -> Text("• $subj", fontSize = 14.sp, color = Kaki, modifier = Modifier.padding(vertical = 1.dp)) }
+                }
+            }
+            Icon(Icons.Default.ChevronRight, null, modifier = Modifier.align(Alignment.CenterVertically))
+        }
+    }
 }
 
 @Composable
